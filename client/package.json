@@ -2,7 +2,7 @@
   "name": "client",
   "version": "1.0.0",
   "description": "A Vue.js project",
-  "author": "Aneeta Sharma <get.aneeta@gmail.com>",
+  "author": "",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
@@ -15,9 +15,12 @@
   },
   "dependencies": {
     "axios": "^0.16.2",
+    "moment": "^2.22.2",
     "vue": "^2.4.2",
     "vue-router": "^2.7.0",
-    "vue-sweetalert2": "^1.0.7"
+    "vue-sweetalert2": "^1.0.7",
+    "vuelidate": "^0.7.4",
+    "vuetify": "^1.1.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
@@ -92,5 +95,6 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "proxy": "localhost:8081"
 }

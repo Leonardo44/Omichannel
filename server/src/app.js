@@ -8,76 +8,100 @@ app.use(morgan('combined'))
 app.use(bodyParser.json())
 app.use(cors())
 
-const mongodb_conn_module = require('./mongodbConnModule');
-var db = mongodb_conn_module.connect();
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 
-var Post = require("../models/post");
+const mongodb_conn_module = require('./mongodbConnModule')
+const db = mongodb_conn_module.connect()
 
-app.get('/posts', (req, res) => {
-  Post.find({}, 'title description', function (error, posts) {
-	  if (error) { console.error(error); }
-	  res.send({
-			posts: posts
-		})
-	}).sort({_id:-1})
-})
+/**
+ * Controllers
+ */
+const AccountController = require('../controllers/account')
+const ReportsController = require('../controllers/reports')
 
-app.post('/add_post', (req, res) => {
-	var db = req.db;
-	var title = req.body.title;
-	var description = req.body.description;
-	var new_post = new Post({
-		title: title,
-		description: description
-	})
+app.use('/accounts', AccountController)
+app.use('/reports', ReportsController)
 
-	new_post.save(function (error) {
-		if (error) {
-			console.log(error)
-		}
-		res.send({
-			success: true
-		})
-	})
-})
 
-app.put('/posts/:id', (req, res) => {
-	var db = req.db;
-	Post.findById(req.params.id, 'title description', function (error, post) {
-	  if (error) { console.error(error); }
+// --------------------------------------
 
-	  post.title = req.body.title
-	  post.description = req.body.description
-	  post.save(function (error) {
-			if (error) {
-				console.log(error)
-			}
-			res.send({
-				success: true
-			})
-		})
-	})
-})
+// app.get('/posts', (req, res) => {
+//   Post.find({}, 'title description', function(error, posts) {
+//     if (error) {
+//       console.error(error)
+//     }
+//     res.send({
+//       posts: posts
+//     })
+//   }).sort({ _id: -1 })
+// })
 
-app.delete('/posts/:id', (req, res) => {
-	var db = req.db;
-	Post.remove({
-		_id: req.params.id
-	}, function(err, post){
-		if (err)
-			res.send(err)
-		res.send({
-			success: true
-		})
-	})
-})
+// app.post('/add_post', (req, res) => {
+//   var db = req.db
+//   var title = req.body.title
+//   var description = req.body.description
+//   var new_post = new Post({
+//     title: title,
+//     description: description
+//   })
 
-app.get('/post/:id', (req, res) => {
-	var db = req.db;
-	Post.findById(req.params.id, 'title description', function (error, post) {
-	  if (error) { console.error(error); }
-	  res.send(post)
-	})
-})
+//   new_post.save(function(error) {
+//     if (error) {
+//       console.log(error)
+//     }
+//     res.send({
+//       success: true
+//     })
+//   })
+// })
+
+// app.put('/posts/:id', (req, res) => {
+//   var db = req.db
+//   Post.findById(req.params.id, 'title description', function(error, post) {
+//     if (error) {
+//       console.error(error)
+//     }
+
+//     post.title = req.body.title
+//     post.description = req.body.description
+//     post.save(function(error) {
+//       if (error) {
+//         console.log(error)
+//       }
+//       res.send({
+//         success: true
+//       })
+//     })
+//   })
+// })
+
+// app.delete('/posts/:id', (req, res) => {
+//   var db = req.db
+//   Post.remove(
+//     {
+//       _id: req.params.id
+//     },
+//     function(err, post) {
+//       if (err) res.send(err)
+//       res.send({
+//         success: true
+//       })
+//     }
+//   )
+// })
+
+// app.get('/post/:id', (req, res) => {
+//   var db = req.db
+//   Post.findById(req.params.id, 'title description', function(error, post) {
+//     if (error) {
+//       console.error(error)
+//     }
+//     res.send(post)
+//   })
+// })
 
 app.listen(process.env.PORT || 8081)

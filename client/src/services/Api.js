@@ -1,7 +1,10 @@
 import axios from 'axios'
 
-export default() => {
+// const apiHost = 'localhost'
+const apiHost = '127.0.0.1'
+
+export default () => {
   return axios.create({
-    baseURL: `http://localhost:8081`
+    baseURL: `http://${apiHost}:8081`
   })
 }
