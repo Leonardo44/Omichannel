@@ -174,12 +174,12 @@
       </v-dialog>
 
       <v-dialog v-model="resultCont" fullscreen hide-overlay transition="dialog-bottom-transition">
-        <form ref="frmReportPDF" method="POST" action="http://172.16.11.172:9000/account/averages_messages/pdf" target="__blank">
-          <input type="hidden" name="data" :value="JSON.stringify(mainData)">
+        <form ref="frmReportPDF" method="POST" action="http://172.16.11.172:9000/api/account/averages_messages/pdf" target="__blank">
+          <input type="hidden" name="data" :value="JSON.stringify(reportData)">
         </form>
 
-        <form ref="frmReportExcel" method="POST" action="http://172.16.11.172:9000/account/averages_messages/excel" target="__blank">
-          <input type="hidden" name="data" :value="JSON.stringify(mainData)">
+        <form ref="frmReportExcel" method="POST" action="http://172.16.11.172:9000/api/account/averages_messages/excel" target="__blank">
+          <input type="hidden" name="data" :value="JSON.stringify(reportData)">
         </form>
         <v-card>
           <v-toolbar dark color="indigo">
@@ -247,6 +247,7 @@
       ],
       frmIsValid: true,
       mainData: [],
+      reportData: null,
       dataHeader: [],
       isLoading: false,
 
@@ -322,15 +323,13 @@
           let auxData = res.data
           let _aux = []
 
-          auxData.interfaces.forEach($i => {
-            for (let $dateData in auxData.data) {
-              let row = {date: $dateData.split('_').join(' ')}
-              for (let $dKey in auxData.data[$dateData]) {
-                row[$dKey] = auxData.data[$dateData][$dKey]
-              }
-              _aux.push(row)
+          for (let $dateData in auxData.data) {
+            let row = {date: $dateData.split('_').join(' ')}
+            for (let $dKey in auxData.data[$dateData]) {
+              row[$dKey] = auxData.data[$dateData][$dKey]
             }
-          })
+            _aux.push(row)
+          }
 
           this.dataHeader = [{text: 'Fecha', value: 'date', align: 'center', sortable: false, 'class': 'indigo white--text'}]
           this.dataHeader = this.dataHeader.concat(auxData.interfaces.map($i => ({
@@ -338,7 +337,8 @@
           })))
 
           this.mainData = _aux
-
+          this.reportData = res.data
+          this.reportData.data = this.mainData
           this.endLoad()
           this.isLoading = false
           this.resultCont = true
