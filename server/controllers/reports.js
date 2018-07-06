@@ -6,7 +6,7 @@ const ObjectId = require('mongodb').ObjectId;
 
 const moment = require('moment');
 
-const host = false ? 'localhost' : '172.16.11.128';
+const host = '172.16.11.128';
 const url = `mongodb://${host}:27017`;
 const dbName = 'eve2';
 

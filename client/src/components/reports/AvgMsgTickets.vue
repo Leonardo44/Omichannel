@@ -3,7 +3,7 @@
 
       <v-flex xs12>
         <v-form ref="form" v-model="frmIsValid" lazy-validation>
-          <h2 class="indigo--text text-xs-center text-sm-center text-md-center text-lg-center">Promedio de Mensajes por Ticket por Interfaz de Cuenta</h2>
+          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Promedio de Mensajes por Ticket por Interfaz de Cuenta</h2>
           <br>
           <v-layout row wrap justify-center class="mb-5">
             <v-flex xs12 sm12 md6 lg6>
@@ -12,7 +12,7 @@
                 :items="accounts" item-text="name" item-value="_id"
                 :rules="[v => !!v || 'La cuenta es requerida']"
                 label="Cuenta"
-                required color="indigo"
+                required :color="colors.secondary.back"
               ></v-select>
             </v-flex>
           </v-layout>
@@ -40,11 +40,11 @@
                       label="Fecha de Inicio"
                       prepend-icon="event"
                       readonly
-                      color="indigo"
+                      :color="colors.secondary.back"
                       required
                       :rules="[rules.date.required, rules.date.format]"
                     ></v-text-field>
-                    <v-date-picker v-model="initDate" first-day-of-week="1" locale="es_es" scrollable color="indigo" @input="$refs.initDateMenu.save(initDate)"></v-date-picker>
+                    <v-date-picker v-model="initDate" first-day-of-week="1" locale="es_es" scrollable :color="colors.secondary.back" @input="$refs.initDateMenu.save(initDate)"></v-date-picker>
 
                   </v-menu>
 
@@ -67,10 +67,10 @@
                       prepend-icon="event"
                       readonly
                       required
-                      color="indigo"
+                      :color="colors.secondary.back"
                       :rules="[rules.date.required, rules.date.format, rules.date.validRange]"
                     ></v-text-field>
-                    <v-date-picker v-model="endDate" first-day-of-week="1" locale="es_es" scrollable color="indigo" @input="$refs.endDateMenu.save(endDate)"></v-date-picker>
+                    <v-date-picker v-model="endDate" first-day-of-week="1" locale="es_es" scrollable :color="colors.secondary.back" @input="$refs.endDateMenu.save(endDate)"></v-date-picker>
                   </v-menu>
                 </v-flex>
 
@@ -95,10 +95,10 @@
                       prepend-icon="access_time"
                       readonly
                       required
-                      color="indigo"
+                      :color="colors.secondary.back"
                       :rules="[rules.time.required, rules.time.format]"
                     ></v-text-field>
-                    <v-time-picker v-model="initTime" first-day-of-week="1" locale="es_es" scrollable color="indigo" @change="$refs.initTimeMenu.save(initTime)"></v-time-picker>
+                    <v-time-picker v-model="initTime" first-day-of-week="1" locale="es_es" scrollable :color="colors.secondary.back" @change="$refs.initTimeMenu.save(initTime)"></v-time-picker>
 
                   </v-menu>
 
@@ -122,10 +122,10 @@
                       prepend-icon="access_time"
                       readonly
                       required
-                      color="indigo"
+                      :color="colors.secondary.back"
                       :rules="[rules.time.required, rules.time.format, rules.time.validRange]"
                     ></v-text-field>
-                    <v-time-picker v-model="endTime" first-day-of-week="1" locale="es_es" scrollable color="indigo" @change="$refs.endTimeMenu.save(endTime)"></v-time-picker>
+                    <v-time-picker v-model="endTime" first-day-of-week="1" locale="es_es" scrollable :color="colors.secondary.back" @change="$refs.endTimeMenu.save(endTime)"></v-time-picker>
 
                   </v-menu>
                 </v-flex>
@@ -139,7 +139,7 @@
               <span class="">Seleccione el tipo de intervalo en el cual se dividirán los datos</span>
                 <div>
                   <v-radio-group v-model="interval">
-                    <v-radio v-for="(_opt) in intervalOptions" :rules="v => !!v || 'Yei'" required :key="_opt.value" :label="_opt.text" :value="_opt.value" color="indigo"></v-radio>
+                    <v-radio v-for="(_opt) in intervalOptions" :rules="v => !!v || 'Yei'" required :key="_opt.value" :label="_opt.text" :value="_opt.value" :color="colors.secondary.back"></v-radio>
                   </v-radio-group>
                 </div>
               </v-layout>
@@ -150,12 +150,12 @@
             <v-btn
               ref="btnSubmit"
               :disabled="!frmIsValid || isLoading"
-              color="indigo white--text"
+              :color="colors.primary.back + ' white--text'"
               @click="submit"
             >
               Enviar datos
             </v-btn>
-            <v-btn @click="clear" color="indigo--text">Limpiar</v-btn>
+            <v-btn @click="clear" :color="colors.primary.text">Limpiar</v-btn>
           </v-layout>
 
         </v-form>
@@ -168,7 +168,7 @@
       >
         <v-card>
           <v-layout pa-5 justify-center align-content-center align-center>
-            <v-progress-circular indeterminate :size="70" :width="7" color="indigo"></v-progress-circular>
+            <v-progress-circular indeterminate :size="70" :width="7" :color="colors.primary.back"></v-progress-circular>
           </v-layout>
         </v-card>
       </v-dialog>
@@ -182,7 +182,7 @@
           <input type="hidden" name="data" :value="JSON.stringify(reportData)">
         </form>
         <v-card>
-          <v-toolbar dark color="indigo">
+          <v-toolbar dark :color="colors.primary.back">
             <v-btn icon dark @click.native="resultCont = false">
               <v-icon>close</v-icon>
             </v-btn>
@@ -237,6 +237,7 @@
   import AccountsService from '@/services/AccountsService'
 
   export default {
+    props: ['colors'],
     data: () => ({
       //  Data
       accounts: [],
@@ -331,9 +332,9 @@
             _aux.push(row)
           }
 
-          this.dataHeader = [{text: 'Fecha', value: 'date', align: 'center', sortable: false, 'class': 'indigo white--text'}]
+          this.dataHeader = [{text: 'Fecha', value: 'date', align: 'center', sortable: false, 'class': this.props.colors.primary + ' white--text'}]
           this.dataHeader = this.dataHeader.concat(auxData.interfaces.map($i => ({
-            text: $i.name, value: $i.name, sortable: false, align: 'center', 'class': 'indigo white--text'
+            text: $i.name, value: $i.name, sortable: false, align: 'center', 'class': this.props.colors.primary + ' white--text'
           })))
 
           this.mainData = _aux

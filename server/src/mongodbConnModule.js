@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
-const host = false ? 'localhost' : '172.16.11.128'
+const host = '172.16.11.128'
 const port = '27017'
-const database = false ? 'eve' : 'eve2'
+const database = 'eve2'
 
 module.exports.connect = function() {
   mongoose.connect(`mongodb://${host}:${port}/${database}`)

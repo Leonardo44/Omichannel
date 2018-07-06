@@ -21,22 +21,26 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: Hello
+      component: Hello,
+      props: true
     },
     {
       path: '/reports/accounts/tickets_interface',
       name: 'reports_tickets_interface',
-      component: ticketsinterface
+      component: ticketsinterface,
+      props: true
     },
     {
       path: '/reports/accounts/avg_msg_tickets',
       name: 'reports_avg_msg_tickets',
-      component: avgmsgtickets
+      component: avgmsgtickets,
+      props: true
     },
     {
       path: '/reports/accounts/client_tickets',
       name: 'reports_client_tickets',
-      component: clienttickets
+      component: clienttickets,
+      props: true
     },
     {
       path: '/posts/add',
