@@ -328,7 +328,7 @@ router.post('/tickets_client', (req, res) => {//Número de tickets por cliente
                 }
 
                 const dateKey = `${moment(auxDate[0]).format('YYYY-MM-DD_HH:mm')}_-_${moment(auxDate[1]).format('YYYY-MM-DD_HH:mm')}`;
-                msgData[dateKey] = [];
+                msgData[dateKey] = {};
 
                 if((auxDate[1].format('H:mm:s') <= frmData.endDate.format('H:mm:s'))
                     && (auxDate[1].format('H:mm:s') >= frmData.initDate.format('H:mm:s'))
@@ -352,32 +352,46 @@ router.post('/tickets_client', (req, res) => {//Número de tickets por cliente
                                     $lt: new Date(auxDate[1])
                                 }
                             }
+                        },
+                        {
+                            $group: {
+                                _id: "$client",
+                                count: { $sum: 1 },
+                                name_client: { $first: "$client_data.interfaces" } //PODEMOS DEJAR ESTO SOLO EN INTERFAZ [$first]
+                            }
+                        },
+                        {
+                            $sort: {
+                                count: -1
+                            }
                         }
                     ]).toArray();
 
-                    for(let $t in $tickets){
-                        let clientName = $tickets[$t].client_data[0].interfaces[0].name,
-                            userIndex = msgData[dateKey].findIndex(x => x.name === clientName );
+                    for(let $t in $tickets){ //Recorremos los tickets para obtener la info de los clientes
+                        console.log("______________________________________________");
+                        const client = `${$tickets[$t].name_client[0][0].name}[${$tickets[$t].name_client[0][0].service}]`;
+                        // const index_id = msgData[dateKey].findIndex(x => x.id === $tickets[$t]._id );
 
-                        if(userIndex === -1){ 
-                            msgData[dateKey].push({
-                                name: clientName,
-                                tickets: 0
-                            });
-
-                        }else{
-                            console.log(userIndex);
-                            msgData[dateKey][userIndex].tickets += 1;
-                        }
+                        console.log(msgData[dateKey]);
+                        console.log('\n');
+                        // if(index_id === -1){
+                        //     msgData[dateKey].push({
+                        //         id: $tickets[$t]._id,
+                        //         name: client,
+                        //         cant_tickets: $tickets[$t].count
+                        //     });
+                        // }else{
+                        //     msgData[dateKey][index_id].cant_tickets += $tickets[$t].count;
+                        // }
                     }
+
+                    // console.log(msgData);
+                    // console.log(JSON.stringify(msgData, null, 4));
                 }
-                // console.log(msgData);
             }
 
-            data = msgData;
-            console.log(data);
             res.send({
-                data: data
+                data: 1
             });
         } catch (error) {
             res.send({
@@ -465,21 +479,22 @@ router.post('/avg_time_ticket_interface', (req, res)=>{ //Promedio de duracion d
                 && (auxDate[0].format('H:mm:s') <= frmData.endDate.format('H:mm:s'))
                 && (auxDate[0].format('H:mm:s') >= frmData.initDate.format('H:mm:s'))){
 
-                const $tickets = await app.db(dbName).collection("ticket").aggregate([
-                    {
+                const $tickets = await app.db(dbName).collection("tickets").aggregate([
+                    { 
                         $match: {
-                        "account": ObjectId(account._id),
-                        "organization": ObjectId(organization._id),
-                        "last_msg_date": {
-                            $gte: new Date(auxDate[0]),
-                            $lt: new Date(auxDate[1])
+                            "account": ObjectId(account._id),
+                            "organization": ObjectId(organization._id),
+                            "last_msg_date": { //Fecha
+                                $gte: new Date(auxDate[0]),
+                                $lt: new Date(auxDate[1])
+                            }
                         }
                         }
                     }
-                ]);
+                ]).toArray();
 
                 for(let $t in $tickets){ //Recorremos los tickets para sacar la información necesaria
-                    const data_ticket_messages = await db.collection("messages").aggregate([
+                    const $data_ticket_messages = await app.db(dbName).collection("messages").aggregate([
                         {
                             $lookup: {
                                 from: 'tickets',
@@ -489,7 +504,6 @@ router.post('/avg_time_ticket_interface', (req, res)=>{ //Promedio de duracion d
                             }
                         },
                         { $match: { "ticket": ObjectId($tickets[$t]._id) } }, //Where's
-                        { $sort: { "ticket_data.last_msg_date": -1 } }, //Orden
                         {
                             $group: { //Group By()
                                 _id: "$interface",
@@ -502,14 +516,16 @@ router.post('/avg_time_ticket_interface', (req, res)=>{ //Promedio de duracion d
                         { $addFields: { rest_milliseconds: { $subtract: [ "$time_last", "$time_first"] } } }//Más data
                     ]).toArray();
 
-                    if(!msgData[dateKey].hasOwnProperty(data_ticket_messages[0]._id)){
-                        msgData[dateKey][data_ticket_messages[0]._id] = {
-                            milliseconds: 0,
-                            cant_ticket: 0
-                        };
+                    for(let $d in $data_ticket_messages){
+                        if(!msgData[dateKey].hasOwnProperty($data_ticket_messages[$d]._id)){
+                            msgData[dateKey][$data_ticket_messages[$d]._id] = {
+                                milliseconds: 0,
+                                cant_ticket: 0
+                            };
+                        }
+                        msgData[dateKey][$data_ticket_messages[$d]._id].milliseconds += $data_ticket_messages[$d].rest_milliseconds;
+                        msgData[dateKey][$data_ticket_messages[$d]._id].cant_ticket += $data_ticket_messages.length; 
                     }
-                    msgData[dateKey][data_ticket_messages[0]._id].milliseconds += data_ticket_messages[0].rest_milliseconds;
-                    msgData[dateKey][data_ticket_messages[0]._id].cant += data_ticket_messages.length; 
                 }// fin for(let $t in $tickets)
 
                 for(let $i in $interfaces){
@@ -517,8 +533,9 @@ router.post('/avg_time_ticket_interface', (req, res)=>{ //Promedio de duracion d
                     if(!data[dateKey].hasOwnProperty($interfaces[$i].service)){ data[dateKey][$interfaces[$i].service] = {} }
 
                     if(msgData[dateKey].hasOwnProperty($interfaces[$i].service)){
-                        let avg = msgData[dateKey][$interfaces[$i].service].milliseconds / msgData[dateKey][$interfaces[$i].service].cant;
-                        data[dateKey][$interfaces[$i].service] = (avg);
+                        let avg = msgData[dateKey][$interfaces[$i].service].milliseconds / msgData[dateKey][$interfaces[$i].service].cant_ticket;
+                        let avg_format = prueba = moment().month(0).date(1).hours(0).minutes(0).seconds(0).milliseconds(avg);
+                        data[dateKey][$interfaces[$i].service] = (avg_format.format('H:mm:ss'));
                     }else{
                         data[dateKey][$interfaces[$i].service] = 0;
                     }

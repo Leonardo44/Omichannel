@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // const apiHost = 'localhost'
-const apiHost = '172.16.11.170'
+const apiHost = '127.0.0.1'
 
 export default () => {
   return axios.create({
