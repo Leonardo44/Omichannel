@@ -11,6 +11,7 @@ import editpost from '@/components/EditPost'
 import avgmsgtickets from '@/components/reports/AvgMsgTickets.vue'
 import ticketsinterface from '@/components/reports/TicketsInterface.vue'
 import clienttickets from '@/components/reports/ClientTickets.vue'
+import avgticketstimeinterface from '@/components/reports/AvgTicketsTimeInterface.vue'
 // -----------------------------------------------------------------------------
 
 Vue.use(Router)
@@ -40,6 +41,12 @@ export default new Router({
       path: '/reports/accounts/client_tickets',
       name: 'reports_client_tickets',
       component: clienttickets,
+      props: true
+    },
+    {
+      path: '/reports/accounts/avg_tickets_time_interface',
+      name: 'avg_tickets_time_interface',
+      component: avgticketstimeinterface,
       props: true
     },
     {

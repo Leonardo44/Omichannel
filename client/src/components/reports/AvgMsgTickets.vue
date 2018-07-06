@@ -332,9 +332,9 @@
             _aux.push(row)
           }
 
-          this.dataHeader = [{text: 'Fecha', value: 'date', align: 'center', sortable: false, 'class': this.props.colors.primary + ' white--text'}]
+          this.dataHeader = [{text: 'Fecha', value: 'date', align: 'center', sortable: false, 'class': this.colors.primary.back + ' white--text'}]
           this.dataHeader = this.dataHeader.concat(auxData.interfaces.map($i => ({
-            text: $i.name, value: $i.name, sortable: false, align: 'center', 'class': this.props.colors.primary + ' white--text'
+            text: $i.name, value: $i.name, sortable: false, align: 'center', 'class': this.colors.primary.back + ' white--text'
           })))
 
           this.mainData = _aux
