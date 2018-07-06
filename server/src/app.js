@@ -22,10 +22,11 @@ const db = mongodb_conn_module.connect()
  */
 const AccountController = require('../controllers/account')
 const ReportsController = require('../controllers/reports')
+const OrganizationController = require('../controllers/organization')
 
 app.use('/accounts', AccountController)
 app.use('/reports', ReportsController)
-
+app.use('/organizations', OrganizationController)
 
 // --------------------------------------
 
