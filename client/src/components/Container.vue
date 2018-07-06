@@ -55,7 +55,7 @@
             <v-list-tile slot='activator' >
               <v-list-tile-title>Por Agentes</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile v-for='(_a, i) in reports.agents' :key='i' router v-bind:to="{name: _a.action}" :exact-active-class="props.colors.primary.text" :active-class="props.colors.primary.text" exact>
+            <v-list-tile v-for='(_a, i) in reports.agents' :key='i' router v-bind:to="{name: _a.action, params: {colors: props.colors}}" :exact-active-class="props.colors.primary.text" :active-class="props.colors.primary.text" exact>
               <v-list-tile-title class="text-sm-left" v-text='_a.text'></v-list-tile-title>
             </v-list-tile>
           </v-list-group>
@@ -102,7 +102,7 @@
           {text: 'Tickets por Cliente', icon: 'settings', action: 'reports_client_tickets'}
         ],
         agents: [
-          []
+          {text: 'Tickets por Interfaz', icon: 'user', action: 'reports_agent_ticketsPerInterface'}
         ]
       },
       props: {

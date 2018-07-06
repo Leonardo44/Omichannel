@@ -3,15 +3,15 @@
 
       <v-flex xs12>
         <v-form ref="form" v-model="frmIsValid" lazy-validation>
-          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Promedio de Mensajes por Ticket por Interfaz de Cuenta</h2>
+          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Cantidad de Tickets por Interfaz por Agente</h2>
           <br>
           <v-layout row wrap justify-center class="mb-5">
             <v-flex xs12 sm12 md6 lg6>
               <v-select
-                v-model="account"
-                :items="accounts" item-text="name" item-value="_id"
-                :rules="[v => !!v || 'La cuenta es requerida']"
-                label="Cuenta"
+                v-model="agent"
+                :items="agents" item-text="name" item-value="_id"
+                :rules="[v => !!v || 'El agente es requerida']"
+                label="Agente"
                 required :color="colors.secondary.back"
               ></v-select>
             </v-flex>
@@ -251,13 +251,13 @@
 <script>
   import Api from '@/services/Api'
   import moment from 'moment'
-  import AccountsService from '@/services/AccountsService'
+  import AgentsService from '@/services/AgentsService'
 
   export default {
     props: ['colors'],
     data: () => ({
       //  Data
-      accounts: [],
+      agents: [],
       intervalOptions: [
         {text: '1 Día', value: 'D:1'},
         {text: '1 Hora', value: 'H:1'},
@@ -270,7 +270,7 @@
       isLoading: false,
 
       // Form Fields
-      account: null,
+      agent: null,
       initDate: null,
       endDate: null,
       initTime: null,
@@ -301,7 +301,7 @@
     }),
 
     mounted () {
-      this.getAccounts()
+      this.getAgents()
     },
     created () {
       moment().locale('es_sv')
@@ -310,9 +310,9 @@
       this.interval = this.intervalOptions[0].value
     },
     methods: {
-      async getAccounts () {
-        const response = await AccountsService.fetchAccounts()
-        this.accounts = response.data.accounts
+      async getAgents () {
+        const response = await AgentsService.fetchAgents()
+        this.agents = response.data.accounts
       },
       async submit () {
         let datesData = {

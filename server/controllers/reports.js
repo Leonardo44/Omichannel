@@ -86,6 +86,7 @@ router.post('/avg_msg_tickets', (req, res) => { //Promedio de mensajes por ticke
                             }
                         }
 
+                        
                         for(let $i in $interfaces){
                             if(!data.hasOwnProperty(dateKey)){
                                 data[dateKey] = {};
@@ -94,16 +95,22 @@ router.post('/avg_msg_tickets', (req, res) => { //Promedio de mensajes por ticke
                             if(!data[dateKey].hasOwnProperty($interfaces[$i].service)){
                                 data[dateKey][$interfaces[$i].service] = {}
                             }
-
+                            
                             if(msgData[dateKey].hasOwnProperty($interfaces[$i].service)){
                                 const avg = msgData[dateKey][$interfaces[$i].service].reduce((sum, n) => sum + n, 0) / msgData[dateKey][$interfaces[$i].service].length;
-        
+                                
                                 data[dateKey][$interfaces[$i].service] = (avg);
                             }else{
                                 data[dateKey][$interfaces[$i].service] = (0);
                             }
                         }
                     }
+                    
+                    console.log('\n');
+                    console.log(JSON.stringify(data, null, 4));
+                    console.log('\n');
+                    console.log(data);
+                    console.log('\n');
 
                     res.send({
                         account: account.name,
@@ -459,12 +466,14 @@ router.post('/avg_time_ticket_interface', (req, res)=>{ //Promedio de duracion d
                 && (auxDate[0].format('H:mm:s') >= frmData.initDate.format('H:mm:s'))){
 
                 const $tickets = await app.db(dbName).collection("ticket").aggregate([
-                    $match: {
+                    {
+                        $match: {
                         "account": ObjectId(account._id),
                         "organization": ObjectId(organization._id),
                         "last_msg_date": {
                             $gte: new Date(auxDate[0]),
                             $lt: new Date(auxDate[1])
+                        }
                         }
                     }
                 ]);

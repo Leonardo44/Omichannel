@@ -21,12 +21,18 @@ const db = mongodb_conn_module.connect()
  * Controllers
  */
 const AccountController = require('../controllers/account')
+const AgentController = require('../controllers/agent')
 const ReportsController = require('../controllers/reports')
 const OrganizationController = require('../controllers/organization')
 
 app.use('/accounts', AccountController)
+app.use('/agents', AgentController)
 app.use('/reports', ReportsController)
 app.use('/organizations', OrganizationController)
+
+// app.get('/config', (req, res) => res.send({
+
+// }))
 
 // --------------------------------------
 
