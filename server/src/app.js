@@ -3,7 +3,10 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const morgan = require('morgan')
 
+const dbContextTest = require('./connection').test; 
+
 const app = express()
+
 app.use(morgan('combined'))
 app.use(bodyParser.json())
 app.use(cors())
@@ -12,10 +15,15 @@ app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
-  });
+});
 
-const mongodb_conn_module = require('./mongodbConnModule')
-const db = mongodb_conn_module.connect()
+// const mongodb_conn_module = require('./mongodbConnModule')
+// const db = mongodb_conn_module.connect()
+
+/**
+ * Check Connection
+ */
+dbContextTest();
 
 /**
  * Controllers
