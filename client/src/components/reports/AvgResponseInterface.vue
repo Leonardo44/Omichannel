@@ -3,7 +3,7 @@
 
       <v-flex xs12>
         <v-form ref="form" v-model="frmIsValid" lazy-validation>
-          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Top 10 Agentes por cantidad de tickets y duración</h2>
+          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Promedio de tiempo de duración por interfaz</h2>
           <br>
           <v-layout row wrap justify-center class="mb-5">
             <v-flex xs12 sm12 md5 lg5>
@@ -12,16 +12,6 @@
                 :items="accounts" item-text="name" item-value="_id"
                 :rules="[v => !!v || 'La cuenta es requerida']"
                 label="Cuenta"
-                required :color="colors.secondary.back"
-              ></v-select>
-            </v-flex>
-            <v-spacer></v-spacer>
-            <v-flex xs12 sm12 md5 lg5>
-              <v-select
-                v-model="organization"
-                :items="organizations" item-text="friendly_name" item-value="_id"
-                :rules="[v => !!v || 'La organización es requerida']"
-                label="Organización"
                 required :color="colors.secondary.back"
               ></v-select>
             </v-flex>
@@ -224,6 +214,7 @@
           <br><br>
 
           <!-- RESULT TABLE -->
+          <!-- RESULT TABLE -->
           <v-data-table
             :headers="dataHeader"
             :items="mainData"
@@ -231,14 +222,9 @@
             class="elevation-1"
           >
             <template slot="items" slot-scope="props">
-              <tr>
-                <td class="text-xs-center text-sm-center text-md-center text-lg-center" colspan="3"><b>Fecha: {{ props.item.date }}</b></td>
-              </tr>
-              <tr v-for="agent in props.item.agents">
-                <td class="text-xs-center text-sm-center text-md-center text-lg-center"><b>{{ agent.username }}</b></td>
-                <td class="text-xs-center text-sm-center text-md-center text-lg-center"><b>{{ agent.cant }}</b></td>
-                <td class="text-xs-center text-sm-center text-md-center text-lg-center"><b>{{ agent.duration }}</b></td>
-              </tr>
+              <td v-for="(_i) in dataHeader" :key="_i.value" class="text-xs-center text-sm-center text-md-center text-lg-center">
+                <b>{{ props.item[_i.value] }}</b>
+              </td>
             </template>
           </v-data-table>
           <br><br>
@@ -265,7 +251,6 @@
   import Api from '@/services/Api'
   import moment from 'moment'
   import AccountsService from '@/services/AccountsService'
-  import OrganizationsService from '@/services/OrganizationsService'
   import { colors as configColors } from '@/config'
 
   export default {
@@ -274,7 +259,6 @@
       colors: {},
       //  Data
       accounts: [],
-      organizations: [],
       intervalOptions: [
         {text: '1 Día', value: 'D:1'},
         {text: '1 Hora', value: 'H:1'},
@@ -283,16 +267,11 @@
       frmIsValid: true,
       mainData: [],
       reportData: null,
-      dataHeader: [
-        { text: 'Agente [Username]', value: 'agent', align: 'center', sortable: false, 'class': 'indigo white--text' },
-        { text: 'Cantidad de Tickets', value: 'tickets', sortable: false, align: 'center', 'class': 'indigo white--text' },
-        { text: 'Duración de Tickets', value: 'durations', sortable: false, align: 'center', 'class': 'indigo white--text' }
-      ],
+      dataHeader: [],
       isLoading: false,
 
       // Form Fields
       account: null,
-      organization: null,
       initDate: null,
       endDate: null,
       initTime: null,
@@ -324,7 +303,6 @@
 
     mounted () {
       this.getAccounts()
-      this.getOrganizations()
     },
     created () {
       moment().locale('es_sv')
@@ -337,11 +315,6 @@
       async getAccounts () {
         const response = await AccountsService.fetchAccounts()
         this.accounts = response.data.accounts
-      },
-      async getOrganizations () {
-        const response = await OrganizationsService.fetchOrganizations()
-        // console.log(response.data.organizations)
-        this.organizations = response.data.organizations
       },
       async submit () {
         let datesData = {
@@ -361,26 +334,29 @@
           if (this.$refs.form.validate()) {
             this.initLoad()
             this.isLoading = true
-            const res = await Api().post('/reports/top_agents', {
+            const res = await Api().post('/reports/avg_response_interface', {
               account_id: this.account,
-              organization_id: this.organization,
               interval: this.interval,
               intervalData: {
                 init: {date: this.initDate, time: this.initTime},
                 end: {date: this.endDate, time: this.endTime}
               }
             })
-            this.mainData = res.data
             let auxData = res.data
             let _aux = []
   
             for (let $dateData in auxData.data) {
-              let row = {date: $dateData.split('_').join(' '), agents: []}
+              let row = {date: $dateData.split('_').join(' ')}
               for (let $dKey in auxData.data[$dateData]) {
-                row.agents.push({username: auxData.data[$dateData][$dKey].id, cant: auxData.data[$dateData][$dKey].cant_tickets, duration: auxData.data[$dateData][$dKey].duration})
+                row[$dKey] = auxData.data[$dateData][$dKey]
               }
               _aux.push(row)
             }
+  
+            this.dataHeader = [{text: 'Fecha', value: 'date', align: 'center', sortable: false, 'class': this.colors.primary.back + ' white--text'}]
+            this.dataHeader = this.dataHeader.concat(auxData.interfaces.map($i => ({
+              text: $i.name, value: $i.name, sortable: false, align: 'center', 'class': this.colors.primary.back + ' white--text'
+            })))
   
             this.mainData = _aux
             this.reportData = res.data
