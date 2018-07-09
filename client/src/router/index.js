@@ -14,7 +14,7 @@ import clienttickets from '@/components/reports/ClientTickets.vue'
 import topclients from '@/components/reports/TopClients.vue'
 import avgticketstimeinterface from '@/components/reports/AvgTicketsTimeInterface.vue'
 import topagents from '@/components/reports/TopAgents.vue'
-
+import avgresponseinterface from '@/components/reports/AvgResponseInterface.vue'
 /**
  * Report Components [Agents]
  */
@@ -59,14 +59,17 @@ export default new Router({
     {
       path: '/reports/accounts/top_clients',
       name: 'top_clients',
-      component: topclients,
-      props: true
+      component: topclients
     },
     {
       path: '/reports/accounts/top_agents',
       name: 'top_agents',
-      component: topagents,
-      props: true
+      component: topagents
+    },
+    {
+      path: '/reports/accounts/avg_response_interface',
+      name: 'avg_response_interface',
+      component: avgresponseinterface
     },
     {
       path: '/posts/add',

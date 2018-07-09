@@ -17,8 +17,8 @@ module.exports = (req, res) => {
                 }
             }, data = {}, $flag = true, auxDate = [], msgData = [];
     
-            const account = await app.db(dbName).collection("accounts").findOne({"_id": ObjectId(req.body.account_id)}); //Guardamos Información de la cuenta
-            const organization = await app.db(dbName).collection("organizations").findOne({"_id": ObjectId(req.body.organization_id)}); //Guardamos información de orgnización
+            const account = await db.collection("accounts").findOne({"_id": ObjectId(req.body.account_id)}); //Guardamos Información de la cuenta
+            const organization = await db.collection("organizations").findOne({"_id": ObjectId(req.body.organization_id)}); //Guardamos información de orgnización
             const $interfaces = account.interfaces;
     
             while($flag){    
@@ -81,7 +81,7 @@ module.exports = (req, res) => {
                     && (auxDate[0].format('H:mm:s') <= frmData.endDate.format('H:mm:s'))
                     && (auxDate[0].format('H:mm:s') >= frmData.initDate.format('H:mm:s'))){
     
-                    const $tickets = await app.db(dbName).collection("tickets").aggregate([
+                    const $tickets = await db.collection("tickets").aggregate([
                         { 
                             $match: {
                                 "account": ObjectId(account._id),
@@ -95,7 +95,7 @@ module.exports = (req, res) => {
                     ]).toArray();
     
                     for(let $t in $tickets){ //Recorremos los tickets para sacar la información necesaria
-                        const $data_ticket_messages = await app.db(dbName).collection("messages").aggregate([
+                        const $data_ticket_messages = await db.collection("messages").aggregate([
                             {
                                 $lookup: {
                                     from: 'tickets',

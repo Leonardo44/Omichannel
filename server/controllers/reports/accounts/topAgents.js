@@ -109,13 +109,9 @@ module.exports = (req, res) => {
 								tickets: {$push: "$_id"}
 							}
 						},
-						{
-							$sort: {
-								count: -1
-							}
-						}
+						{ $sort: { count: -1 } }
 					]).toArray();
-                	
+                    
                 	for(let $t in $tickets){
                 		for(let $_t in $tickets[$t].tickets){
                 			const $data_ticket = await db.collection("messages").aggregate([ //Aquí lo que nos importa es el tiempo del ticket
@@ -140,10 +136,10 @@ module.exports = (req, res) => {
 	                            { $addFields: { rest_milliseconds: { $subtract: [ "$time_last", "$time_first"] } } }//Más data
 	                		]).toArray();
 
-                			let index_user = data[dateKey].findIndex(x => x.id === $tickets[$t].name_agent[0]);
+                			let index_user = data[dateKey].findIndex(x => x.id === $tickets[$t].username_agent[0]);
                 			if(index_user === -1){
                 				data[dateKey].push({
-		                			id: $tickets[$t].name_agent[0],
+		                			id: $tickets[$t].username_agent[0],
 		                			cant_tickets: $tickets[$t].cant_tickets,
 		                			duration: $data_ticket[0].rest_milliseconds
 	                			});
@@ -162,19 +158,19 @@ module.exports = (req, res) => {
 						if(a.duration > b.duration){ return 1; }
 						return 0;
 					});
+
+                    data[dateKey].forEach(function(value, index, array){ //Cambiamos el formato a la duración de todos los tickets
+                        let duration_format = moment().month(0).date(1).hours(0).minutes(0).seconds(0).milliseconds(array[index].duration);
+                        array[index].duration = duration_format.format('H:mm:ss'); 
+                    });
+                    data[dateKey].slice(9); //Top 10
                 }//fin if
             }//fin while($flag)
-            console.log(data);
-            res.send({
-                data: data
-            });
-            
+            res.send({ data: data });
             client.close();
         });
     } catch (error) {
         console.log(error);
-        res.send({
-            msg: 'Error'
-        })
+        res.send({ msg: 'Error' })
     }
 }

@@ -4,7 +4,7 @@ const assert = require('assert');
 
 const host = process.env.DB_MONGOCLIENT_HOST || 'localhost'
 const port = process.env.DB_MONGOCLIENT_PORT || '27017'
-const dbName = process.env.DB_NAME || 'eve'
+const dbName = process.env.DB_NAME || 'eve2'
 
 const url = `mongodb://${host}:${port}`;
 
