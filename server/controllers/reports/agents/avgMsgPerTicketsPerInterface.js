@@ -21,11 +21,12 @@ module.exports = (req, res) => {
             
             let data = {}, $flag = true, auxDate = [], msgData = [];
         
-            if(ObjectId.isValid(req.body.agent_id)){
-                const agent = await db.collection("agents").findOne({_id: ObjectId(req.body.agent_id)});
+            if(ObjectId.isValid(req.body.account_id)){
+                const account = await db.collection("accounts").findOne({_id: ObjectId(req.body.account_id)});
         
-                if(agent !== null){
-                    let $interfaces = [];
+                if(account !== null){
+                    const $interfaces = account.interfaces;
+                    const $tickets = await db.collection("tickets").find({ account: ObjectId(account._id) }).toArray();
                     
                     while($flag){
                         
@@ -39,6 +40,8 @@ module.exports = (req, res) => {
                             
                             auxDate[0] = auxDate[1].clone();
                             auxDate[0].add(1, 'm');
+                            // auxDate[0].add(1, frmData.interval.type);
+                            // _aux = auxDate[0].clone();
                             
                             _aux.add(frmData.interval.cant, frmData.interval.type);
                             
@@ -46,64 +49,61 @@ module.exports = (req, res) => {
                                 auxDate[1] = frmData.endDate.clone();
                                 $flag = false;
                             }else{
+                                // auxDate[0].add(1, frmData.interval.type);
                                 auxDate[1] = _aux.clone();
                             }
                         }
-
-                        const $tickets = await db.collection('tickets').find({
-                            agent: ObjectId(agent._id),
-                            last_msg_date: {
-                                $gte: new Date(auxDate[0]),
-                                $lte: new Date(auxDate[1])
-                            }
-                        }) .toArray();
                         
                         const dateKey = `${moment(auxDate[0]).format('YYYY-MM-DD_HH:mm')}_-_${moment(auxDate[1]).format('YYYY-MM-DD_HH:mm')}`;
                         msgData[dateKey] = [];
         
-                        const cant = $tickets.length;
-
-                        for($t in $tickets){
-                            // if(cant) {
-                                const $messages = await db.collection('messages').find({
-                                    ticket: ObjectId($tickets[$t]._id)
-                                }).toArray();
-    
-                                const msgInterface = $messages[0].interface;
+                        for(let $i in $tickets){
+                            const msgs = await db.collection('messages').find({
+                                ticket: ObjectId($tickets[$i]._id), 
+                                date: {
+                                    $gte: new Date(auxDate[0]), 
+                                    $lte: new Date(auxDate[1])
+                                }
+                            }).toArray();
+                                
+                            const cant = msgs.length;
         
-                                if (!msgData[dateKey].hasOwnProperty(msgInterface)) { msgData[dateKey][msgInterface] = 0; }
-                                if ($interfaces.indexOf(msgInterface) === -1) { $interfaces.push(msgInterface) }
-                                msgData[dateKey][msgInterface]++;
-                            // }
+                            if(cant) {
+                                const msgInterface = msgs[0].interface;
+        
+                                if (!msgData[dateKey].hasOwnProperty(msgInterface)) { msgData[dateKey][msgInterface] = []; }
+                                msgData[dateKey][msgInterface].push(cant);
+                            }
                         }
-
+        
+                        
                         for(let $i in $interfaces){
                             if(!data.hasOwnProperty(dateKey)){
                                 data[dateKey] = {};
                             }
                             
-                            if(!data[dateKey].hasOwnProperty($interfaces[$i])){
-                                data[dateKey][$interfaces[$i]] = {}
+                            if(!data[dateKey].hasOwnProperty($interfaces[$i].service)){
+                                data[dateKey][$interfaces[$i].service] = {}
                             }
                             
-                            if(msgData[dateKey].hasOwnProperty($interfaces[$i])){
-                                let cant = msgData[dateKey][$interfaces[$i]];
+                            if(msgData[dateKey].hasOwnProperty($interfaces[$i].service)){
+                                const avg = msgData[dateKey][$interfaces[$i].service].reduce((sum, n) => sum + n, 0) / msgData[dateKey][$interfaces[$i].service].length;
                                 
-                                data[dateKey][$interfaces[$i]] = (cant);
+                                data[dateKey][$interfaces[$i].service] = (avg);
                             }else{
-                                data[dateKey][$interfaces[$i]] = (0);
+                                data[dateKey][$interfaces[$i].service] = (0);
                             }
                         }
                     }
                     
                     res.send({
-                        agent: agent.name,
-                        interfaces: $interfaces,
+                        account: account.name,
+                        interfaces: $interfaces.map(x => ({name: x.service, picture: x.picture})),
                         data
                     });
                 }else{
                     res.send({
-                        msg: 'El agente al que deseas acceder no existe!'
+                        msg: 'La cuenta a la que deseas acceder no existe!'
                     })
                 }
             }else{

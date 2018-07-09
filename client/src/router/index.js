@@ -14,13 +14,12 @@ import clienttickets from '@/components/reports/ClientTickets.vue'
 import topclients from '@/components/reports/TopClients.vue'
 import avgticketstimeinterface from '@/components/reports/AvgTicketsTimeInterface.vue'
 import topagents from '@/components/reports/TopAgents.vue'
+
 /**
  * Report Components [Agents]
  */
-import agentTicketsPerInterface from '@/components/reports/agents/TicketsInterface.vue'
+import agentTicketsPerInterface from '@/components/reports/agents/cantTicketsPerInterface.vue'
 // -----------------------------------------------------------------------------
-
-import agentTicketsPerInterface from '@/components/reports/agents/TicketsInterface.vue'
 
 Vue.use(Router)
 

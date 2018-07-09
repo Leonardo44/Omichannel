@@ -335,7 +335,7 @@
           if (this.$refs.form.validate()) {
             this.initLoad()
             this.isLoading = true
-            const res = await Api().post('/reports/avg_msg_tickets', {
+            const res = await Api().post('/reports/agents/cant_tickets_interface', {
               agent_id: this.agent,
               interval: this.interval,
               intervalData: {
@@ -359,16 +359,16 @@
               }
               this.dataHeader = [{text: 'Fecha', value: 'date', align: 'center', sortable: false, 'class': this.colors.primary.back + ' white--text'}]
               this.dataHeader = this.dataHeader.concat(auxData.interfaces.map($i => ({
-                text: $i.name, value: $i.name, sortable: false, align: 'center', 'class': this.colors.primary.back + ' white--text'
+                text: $i, value: $i, sortable: false, align: 'center', 'class': this.colors.primary.back + ' white--text'
               })))
               this.mainData = _aux
               this.reportData = res.data
               this.reportData.data = this.mainData
+              this.resultCont = true
             }
 
             this.endLoad()
             this.isLoading = false
-            this.resultCont = true
           }
         }
       },

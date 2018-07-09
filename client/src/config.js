@@ -1,11 +1,11 @@
 export const colors = {
   'primary': {
-    'back': 'green darken-4',
-    'text': 'green--text text--darken-4'
+    'back': 'blue darken-4',
+    'text': 'blue--text text--darken-4'
   },
   'secondary': {
-    'back': 'green',
-    'text': 'green--text'
+    'back': 'blue',
+    'text': 'blue--text'
   },
   'accent': {
     'back': 'deep-orange',
