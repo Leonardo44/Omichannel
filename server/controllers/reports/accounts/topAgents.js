@@ -145,7 +145,7 @@ module.exports = (req, res) => {
                 				data[dateKey].push({
 		                			id: $tickets[$t].name_agent[0],
 		                			cant_tickets: $tickets[$t].cant_tickets,
-		                			duration: $data_ticket[0].rest_milliseconds;
+		                			duration: $data_ticket[0].rest_milliseconds
 	                			});
                 			}else{
                 				data[dateKey][index_user].duration += $data_ticket[0].rest_milliseconds;
