@@ -17,8 +17,8 @@ app.use(function(req, res, next) {
     next();
 });
 
-// const mongodb_conn_module = require('./mongodbConnModule')
-// const db = mongodb_conn_module.connect()
+const mongodb_conn_module = require('./mongodbConnModule')
+const db = mongodb_conn_module.connect()
 
 /**
  * Check Connection

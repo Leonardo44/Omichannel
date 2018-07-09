@@ -4,7 +4,8 @@ const avgMsgPerTicketPerInterface = require('./reports/accounts/avgMsgPerTickets
 const cantTicketPerInterface = require('./reports/accounts/cantTicketsPerInterface');
 const cantTicketsPerClient = require('./reports/accounts/cantTicketsPerClient');
 const avgTicketsDurationPerInterface = require('./reports/accounts/avgTicketDurationPerInterface');
-
+const topClients = require('./reports/accounts/topClients');
+const topAgents = require('./reports/accounts/topAgents');
 /**
  * Reportes por CUENTAS
  */
@@ -20,6 +21,12 @@ router.post('/tickets_client', cantTicketsPerClient);
 
 // Promedio de duracion de ticket por interfaz
 router.post('/avg_time_ticket_interface', avgTicketsDurationPerInterface);
+
+// Top 10 clientes
+router.post('/top_clients', topClients);
+
+// Top 10 agents por duración de tickets y cantidad
+router.post('/top_agents', topAgents);
 
 /**
  * Reportes por AGENTES

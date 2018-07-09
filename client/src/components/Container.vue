@@ -100,7 +100,9 @@
           {text: 'Tickets por Interfaz', icon: 'settings', action: 'reports_tickets_interface'},
           {text: 'Promedio de Mensajes por Ticket por Interfaz', icon: 'settings', action: 'reports_avg_msg_tickets'},
           {text: 'Tickets por Cliente', icon: 'settings', action: 'reports_client_tickets'},
-          {text: 'Promedio de Duración de Tickets por Interfaz', icon: 'settings', action: 'avg_tickets_time_interface'}
+          {text: 'Promedio de Duración de Tickets por Interfaz', icon: 'settings', action: 'avg_tickets_time_interface'},
+          {text: 'Top 10 Clientes', icon: 'settings', action: 'top_clients'},
+          {text: 'Top 10 Agentes por duración de tickets y cantidad', icon: 'settings', action: 'top_agents' }
         ],
         agents: [
           {text: 'Tickets por Interfaz', icon: 'user', action: 'reports_agent_ticketsPerInterface'}

@@ -1,9 +1,9 @@
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
-const host = 'localhost';
+const host = '127.0.0.1';
 const url = `mongodb://${host}:27017`;
-const dbName = 'eve';
+const dbName = 'eve2';
 
 module.exports = (callback) => {
     MongoClient.connect(url, { useNewUrlParser: true }, (err, client) => {
@@ -30,7 +30,6 @@ module.exports.test = () => {
             if (err) throw err;
             assert.equal(null, err);
             const db = client.db(dbName);
-
             console.log('\n - Conectado éxitosamente! - \n');
             client.close();
         } catch (error) {

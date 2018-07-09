@@ -3,7 +3,7 @@
 
       <v-flex xs12>
         <v-form ref="form" v-model="frmIsValid" lazy-validation>
-          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Número de tickets por cliente</h2>
+          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Top 10 Clientes</h2>
           <br>
           <v-layout row wrap justify-center class="mb-5">
             <v-flex xs12 sm12 md5 lg5>
@@ -356,7 +356,7 @@
           if (this.$refs.form.validate()) {
             this.initLoad()
             this.isLoading = true
-            const res = await Api().post('/reports/tickets_client', {
+            const res = await Api().post('/reports/top_clients', {
               account_id: this.account,
               organization_id: this.organization,
               interval: this.interval,

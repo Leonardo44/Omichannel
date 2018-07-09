@@ -3,7 +3,7 @@
 
       <v-flex xs12>
         <v-form ref="form" v-model="frmIsValid" lazy-validation>
-          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Número de tickets por cliente</h2>
+          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Top 10 Clientes</h2>
           <br>
           <v-layout row wrap justify-center class="mb-5">
             <v-flex xs12 sm12 md5 lg5>
@@ -354,9 +354,9 @@
           this.dateErrorToast = true
         } else {
           if (this.$refs.form.validate()) {
-            this.initLoad()
-            this.isLoading = true
-            const res = await Api().post('/reports/tickets_client', {
+            // this.initLoad()
+            // this.isLoading = true
+            const res = await Api().post('/reports/top_agents', {
               account_id: this.account,
               organization_id: this.organization,
               interval: this.interval,
@@ -366,23 +366,23 @@
               }
             })
             this.mainData = res.data
-            let auxData = res.data
-            let _aux = []
+            // let auxData = res.data
+            // let _aux = []
   
-            for (let $dateData in auxData.data) {
-              let row = {date: $dateData.split('_').join(' '), clients: []}
-              for (let $dKey in auxData.data[$dateData]) {
-                row.clients.push({ name: auxData.data[$dateData][$dKey].name, cant: auxData.data[$dateData][$dKey].cant })
-              }
-              _aux.push(row)
-            }
+            // for (let $dateData in auxData.data) {
+            //   let row = {date: $dateData.split('_').join(' '), clients: []}
+            //   for (let $dKey in auxData.data[$dateData]) {
+            //     row.clients.push({ name: auxData.data[$dateData][$dKey].name, cant: auxData.data[$dateData][$dKey].cant })
+            //   }
+            //   _aux.push(row)
+            // }
   
-            this.mainData = _aux
-            this.reportData = res.data
-            this.reportData.data = this.mainData
-            this.endLoad()
-            this.isLoading = false
-            this.resultCont = true
+            // this.mainData = _aux
+            // this.reportData = res.data
+            // this.reportData.data = this.mainData
+            // this.endLoad()
+            // this.isLoading = false
+            // this.resultCont = true
           }
         }
       },
