@@ -73,75 +73,98 @@ module.exports = (req, res) => {
                 }
 
                 const dateKey = `${moment(auxDate[0]).format('YYYY-MM-DD_HH:mm')}_-_${moment(auxDate[1]).format('YYYY-MM-DD_HH:mm')}`;
-                msgData[dateKey] = [];
+                data[dateKey] = [];
 
                 if((auxDate[1].format('H:mm:s') <= frmData.endDate.format('H:mm:s'))
                     && (auxDate[1].format('H:mm:s') >= frmData.initDate.format('H:mm:s'))
                     && (auxDate[0].format('H:mm:s') <= frmData.endDate.format('H:mm:s'))
                     && (auxDate[0].format('H:mm:s') >= frmData.initDate.format('H:mm:s'))){
-                    const $tickets = await db.collection("tickets").aggregate([ //Obtenemos los tickets por cuenta iterada 
-                        {
-                            $lookup: {
-                                from: 'clients',
-                                localField: 'client',
-                                foreignField: '_id',
-                                as: 'client_data'
-                            }
-                        },
-                        {
-                            $match: {
-                                "account": ObjectId(account._id),
+                    
+                    const $tickets = await  db.collection("tickets").aggregate([ //Obtenemos los agentes con sus tickets
+						{
+							$lookup: {
+								from: 'agents',
+								localField: 'agent',
+								foreignField: '_id',
+								as: 'agent_data'
+							}
+						},
+						{
+							$match: {
+								"account": ObjectId(account._id),
                                 "organization": ObjectId(organization._id),
-                                "last_msg_date": { //Fecha
+								"last_msg_date": { //Fecha
                                     $gte: new Date(auxDate[0]),
                                     $lt: new Date(auxDate[1])
                                 }
-                            }
-                        },
-                        {
-                            $group: {
-                                _id: "$client",
-                                count: { $sum: 1 },
-                                name_client: { $first: "$client_data.interfaces" } //PODEMOS DEJAR ESTO SOLO EN INTERFAZ [$first]
-                            }
-                        },
-                        {
-                            $sort: {
-                                count: -1
-                            }
-                        }
-                    ]).toArray();
+							}
+						},
+						{
+							$group: {
+								_id: "$agent",
+								cant_tickets: { $sum: 1 },
+								name_agent: { $first: "$agent_data.name" },
+								token_key: { $first: "$agent_data.token_key" },
+								username_agent: { $first: "$agent_data.auth.username"},
+								tickets: {$push: "$_id"}
+							}
+						},
+						{
+							$sort: {
+								count: -1
+							}
+						}
+					]).toArray();
+                	
+                	for(let $t in $tickets){
+                		for(let $_t in $tickets[$t].tickets){
+                			const $data_ticket = await db.collection("messages").aggregate([ //Aquí lo que nos importa es el tiempo del ticket
+	                			{
+	                                $lookup: {
+	                                    from: 'tickets',
+	                                    localField: 'ticket',
+	                                    foreignField: '_id',
+	                                    as: 'ticket_data'
+	                                }
+	                            },
+	                            { $match: { "ticket": ObjectId($tickets[$t].tickets[$_t]) } }, //Where's
+	                            {
+	                                $group: { //Group By()
+	                                    _id: "$ticket",
+	                                    cant_messages: { $sum: 1 },
+	                                    time_first: { $first: "$date"},
+	                                    time_last: { $last: "$date"},
+	                                    times: {$push: "$date"},
+	                                }
+	                            },
+	                            { $addFields: { rest_milliseconds: { $subtract: [ "$time_last", "$time_first"] } } }//Más data
+	                		]).toArray();
 
-                    for(let $t in $tickets){ //Recorremos los tickets para obtener la info de los clientes
-                        const client = `${$tickets[$t].name_client[0][0].name}[${$tickets[$t].name_client[0][0].service}]`;
-                        const index_id = msgData[dateKey].findIndex(x => x.id === $tickets[$t]._id );
+                			let index_user = data[dateKey].findIndex(x => x.id === $tickets[$t].name_agent[0]);
+                			if(index_user === -1){
+                				data[dateKey].push({
+		                			id: $tickets[$t].name_agent[0],
+		                			cant_tickets: $tickets[$t].cant_tickets,
+		                			duration: $data_ticket[0].rest_milliseconds
+	                			});
+                			}else{
+                				data[dateKey][index_user].duration += $data_ticket[0].rest_milliseconds;
+                			}
+                		}//fin for(let $_t in  $tickets[$t].tickets)	
+                	}//fin for(let $t in $tickets)
 
-                        if(index_id === -1){
-                            msgData[dateKey].push({
-                                id: $tickets[$t]._id,
-                                name: client,
-                                cant_tickets: $tickets[$t].count
-                            });
-                        }else{
-                            msgData[dateKey][index_id].cant_tickets += $tickets[$t].count;
-                        }
-                    }
-
-                    for(let $msg in msgData){
-                        for(let $info_client in msgData[$msg]){
-                            if(!data.hasOwnProperty(dateKey)){ data[dateKey] = {}; }
-
-                            if(!data[dateKey].hasOwnProperty( msgData[$msg][$info_client].id )){
-                                data[dateKey][msgData[$msg][$info_client].id] = {
-                                    name: msgData[$msg][$info_client].name,
-                                    cant: msgData[$msg][$info_client].cant_tickets
-                                };
-                            }
-                        }
-                    }//fin for(let $msg in msgData)
+                	data[dateKey].sort(function(a, b){//Ordenar según cantidad de ticket
+                		if(a.cant_tickets < b.cant_tickets) { return -1; }
+                		if(a.duration > b.cant_tickets) { return 1; }
+                		return 0;
+					}).sort(function(a, b){//Ordenar según duración de tickets por milisegundos
+						if(a.duration < b.duration){ return -1; }
+						if(a.duration > b.duration){ return 1; }
+						return 0;
+					});
                 }//fin if
             }//fin while($flag)
-
+            console.log(data);
             res.send({
                 data: data
             });
