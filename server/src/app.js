@@ -7,6 +7,8 @@ const dbContextTest = require('./connection').test;
 
 const app = express()
 
+require('dotenv').config()
+
 app.use(morgan('combined'))
 app.use(bodyParser.json())
 app.use(cors())
@@ -17,8 +19,8 @@ app.use(function(req, res, next) {
     next();
 });
 
-// const mongodb_conn_module = require('./mongodbConnModule')
-// const db = mongodb_conn_module.connect()
+const mongodb_conn_module = require('./mongodbConnModule')
+const db = mongodb_conn_module.connect()
 
 /**
  * Check Connection
@@ -119,4 +121,4 @@ app.use('/organizations', OrganizationController)
 //   })
 // })
 
-app.listen(process.env.PORT || 8081)
+app.listen(process.env.APP_PORT || 8081, process.env.APP_HOST || 'localhost');

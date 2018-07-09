@@ -1,23 +1,27 @@
 import Api from '@/services/Api'
 
 export default {
-  fetchAccounts () {
-    return Api().get('agents')
+  fetchAgents (fields) {
+    return Api().get('agents', {
+      params: {
+        fields
+      }
+    })
   },
 
-  addAccount (params) {
-    return Api().Account('agent', params)
+  addAgent (params) {
+    return Api().post('agent', params)
   },
 
-  updateAccount (params) {
+  updateAgent (params) {
     return Api().put('agents/' + params.id, params)
   },
 
-  getAccount (params) {
+  getAgent (params) {
     return Api().get('agent/' + params.id)
   },
 
-  deleteAccount (id) {
+  deleteAgent (id) {
     return Api().delete('agents/' + id)
   }
 }

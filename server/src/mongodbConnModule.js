@@ -1,14 +1,15 @@
 const mongoose = require('mongoose')
-const host = 'localhost'
-const port = '27017'
-const database = 'eve'
+
+const host = process.env.DB_MONGOOSE_HOST || 'localhost'
+const port = process.env.DB_MONGOOSE_PORT || '27017'
+const database = process.env.DB_NAME || 'eve'
 
 module.exports.connect = function() {
   mongoose.connect(`mongodb://${host}:${port}/${database}`)
   const db = mongoose.connection
   db.on('error', console.error.bind(console, 'connection error'))
   db.once('open', function(callback) {
-    console.log('Connection Succeeded')
+    console.log(`\n> Mongoose: \t- Conectado éxitosamente! - \n`);
   })
   return db
 }

@@ -10,7 +10,7 @@
               <v-select
                 v-model="agent"
                 :items="agents" item-text="name" item-value="_id"
-                :rules="[v => !!v || 'El agente es requerida']"
+                :rules="[v => !!v || 'El agente es requerido']"
                 label="Agente"
                 required :color="colors.secondary.back"
               ></v-select>
@@ -252,10 +252,12 @@
   import Api from '@/services/Api'
   import moment from 'moment'
   import AgentsService from '@/services/AgentsService'
+  import { colors as configColors } from '@/config'
 
   export default {
-    props: ['colors'],
     data: () => ({
+      // Config data
+      colors: {},
       //  Data
       agents: [],
       intervalOptions: [
@@ -308,11 +310,12 @@
       this.initDate = this.endDate = moment().format('YYYY-MM-DD')
       this.initTime = moment().utc(true).format('HH:mm')
       this.interval = this.intervalOptions[0].value
+      this.colors = configColors
     },
     methods: {
       async getAgents () {
-        const response = await AgentsService.fetchAgents()
-        this.agents = response.data.accounts
+        const response = await AgentsService.fetchAgents(['_id', 'name'])
+        this.agents = response.data.agents
       },
       async submit () {
         let datesData = {
@@ -333,33 +336,36 @@
             this.initLoad()
             this.isLoading = true
             const res = await Api().post('/reports/avg_msg_tickets', {
-              account_id: this.account,
+              agent_id: this.agent,
               interval: this.interval,
               intervalData: {
                 init: {date: this.initDate, time: this.initTime},
                 end: {date: this.endDate, time: this.endTime}
               }
             })
-  
+
             let auxData = res.data
             let _aux = []
-  
-            for (let $dateData in auxData.data) {
-              let row = {date: $dateData.split('_').join(' ')}
-              for (let $dKey in auxData.data[$dateData]) {
-                row[$dKey] = auxData.data[$dateData][$dKey]
+
+            if (res.data.msg !== undefined) {
+              alert('Hubo un error!!!!')
+            } else {
+              for (let $dateData in auxData.data) {
+                let row = {date: $dateData.split('_').join(' ')}
+                for (let $dKey in auxData.data[$dateData]) {
+                  row[$dKey] = auxData.data[$dateData][$dKey]
+                }
+                _aux.push(row)
               }
-              _aux.push(row)
+              this.dataHeader = [{text: 'Fecha', value: 'date', align: 'center', sortable: false, 'class': this.colors.primary.back + ' white--text'}]
+              this.dataHeader = this.dataHeader.concat(auxData.interfaces.map($i => ({
+                text: $i.name, value: $i.name, sortable: false, align: 'center', 'class': this.colors.primary.back + ' white--text'
+              })))
+              this.mainData = _aux
+              this.reportData = res.data
+              this.reportData.data = this.mainData
             }
-  
-            this.dataHeader = [{text: 'Fecha', value: 'date', align: 'center', sortable: false, 'class': this.colors.primary.back + ' white--text'}]
-            this.dataHeader = this.dataHeader.concat(auxData.interfaces.map($i => ({
-              text: $i.name, value: $i.name, sortable: false, align: 'center', 'class': this.colors.primary.back + ' white--text'
-            })))
-  
-            this.mainData = _aux
-            this.reportData = res.data
-            this.reportData.data = this.mainData
+
             this.endLoad()
             this.isLoading = false
             this.resultCont = true

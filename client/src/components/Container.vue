@@ -18,7 +18,7 @@
       <v-list class='pt-0'>
         <v-divider></v-divider>
         
-        <v-list-tile router v-bind:to="{name: 'home'}" :active-class="props.colors.primary.text" exact>
+        <v-list-tile router v-bind:to="{name: 'home'}" :active-class="colors.primary.text" exact>
           <v-list-tile-action>
             <v-icon>home</v-icon>
           </v-list-tile-action>
@@ -27,7 +27,7 @@
           </v-list-tile-content>
         </v-list-tile>
 
-        <v-list-tile router v-bind:to="{name: 'home'}" :active-class="props.colors.primary.text" exact>
+        <v-list-tile router v-bind:to="{name: 'home'}" :active-class="colors.primary.text" exact>
           <v-list-tile-action>
             <v-icon>contact_mail</v-icon>
           </v-list-tile-action>
@@ -36,26 +36,26 @@
           </v-list-tile-content>
         </v-list-tile>
 
-        <v-list-group prepend-icon='description' :value="true" :active-class="props.colors.primary.text">
+        <v-list-group prepend-icon='description' :value="true" :active-class="colors.primary.text">
 
           <v-list-tile slot='activator'>
             <v-list-tile-title>Reportes</v-list-tile-title>
           </v-list-tile>
           
-          <v-list-group sub-group no-action :value="true" :active-class="props.colors.primary.text">
+          <v-list-group sub-group no-action :value="true" :active-class="colors.primary.text">
             <v-list-tile slot='activator'>
               <v-list-tile-title>Por Cuentas</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile v-for='(_a, i) in reports.accounts' :key='i' router v-bind:to="{name: _a.action, params: {colors: props.colors}}" :exact-active-class="props.colors.primary.text" :active-class="props.colors.primary.text" exact>
+            <v-list-tile v-for='(_a, i) in reports.accounts' :key='i' router v-bind:to="{name: _a.action, params: {colors: colors}}" :exact-active-class="colors.primary.text" :active-class="colors.primary.text" exact>
               <v-list-tile-title class="text-sm-left" v-text='_a.text'></v-list-tile-title>
             </v-list-tile>
           </v-list-group>
 
-          <v-list-group sub-group no-action :value="true" :active-class="props.colors.primary.text">
+          <v-list-group sub-group no-action :value="true" :active-class="colors.primary.text">
             <v-list-tile slot='activator' >
               <v-list-tile-title>Por Agentes</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile v-for='(_a, i) in reports.agents' :key='i' router v-bind:to="{name: _a.action, params: {colors: props.colors}}" :exact-active-class="props.colors.primary.text" :active-class="props.colors.primary.text" exact>
+            <v-list-tile v-for='(_a, i) in reports.agents' :key='i' router v-bind:to="{name: _a.action, params: {colors: colors}}" :exact-active-class="colors.primary.text" :active-class="colors.primary.text" exact>
               <v-list-tile-title class="text-sm-left" v-text='_a.text'></v-list-tile-title>
             </v-list-tile>
           </v-list-group>
@@ -65,7 +65,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-toolbar :color="props.colors.primary.back" dark fixed app>
+    <v-toolbar :color="colors.primary.back" dark fixed app>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       <v-toolbar-title>Application</v-toolbar-title>
     </v-toolbar>
@@ -78,7 +78,7 @@
       </v-container>
     </v-content>
 
-    <v-footer :color="props.colors.primary.back" app>
+    <v-footer :color="colors.primary.back" app>
       <span class="white--text">&copy; 2017</span>
     </v-footer>
 
@@ -86,14 +86,11 @@
 </template>
 
 <script>
-  /**
-   * Color
-   */
-  // Primary => light-blue
-  // Secondary => light-blue darken-4
-  // Accent => deep-orange accent-3
+  import { colors as configColors } from '@/config.js'
+  
   export default {
     data: () => ({
+      colors: {},
       drawer: null,
       reports: {
         accounts: [
@@ -105,23 +102,10 @@
         agents: [
           {text: 'Tickets por Interfaz', icon: 'user', action: 'reports_agent_ticketsPerInterface'}
         ]
-      },
-      props: {
-        colors: {
-          primary: {
-            back: 'light-blue darken-4',
-            text: 'light-blue--text text--darken-4'
-          },
-          secondary: {
-            back: 'light-blue',
-            text: 'light-blue--text'
-          },
-          accent: {
-            back: 'deep-orange',
-            text: 'deep-orange--text text--accent-3'
-          }
-        }
       }
-    })
+    }),
+    created () {
+      this.colors = configColors
+    }
   }
 </script>

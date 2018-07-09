@@ -5,6 +5,7 @@ const cantTicketPerInterface = require('./reports/accounts/cantTicketsPerInterfa
 const cantTicketsPerClient = require('./reports/accounts/cantTicketsPerClient');
 const avgTicketsDurationPerInterface = require('./reports/accounts/avgTicketDurationPerInterface');
 
+const cantTicketsPerInterfacePerAgent = require('./reports/agents/cantTicketsPerInterfacePerAgent');
 /**
  * Reportes por CUENTAS
  */
@@ -24,5 +25,6 @@ router.post('/avg_time_ticket_interface', avgTicketsDurationPerInterface);
 /**
  * Reportes por AGENTES
  */
+router.post('/agents/cant_tickets_interface',cantTicketsPerInterfacePerAgent);
 
 module.exports = router;

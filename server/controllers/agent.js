@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const Account = require('../models/account')
+const Agent = require('../models/agent')
 
 
 /**
@@ -8,22 +8,27 @@ const Account = require('../models/account')
 
 // GET agents (All)
 router.get('/', (req, res) => {
-    Account.find(function(error, agents) {
+    let fieldAux = {};
+    if (req.query.fields !== undefined){
+        req.query.fields.forEach($f => fieldAux[$f] = true);
+    }
+
+    Agent.find(function(error, agents) {
         if (error) {
-        console.error(error)
+            console.error(error)
         }
         res.send({
             agents: agents
         })
-    }).sort({ _id: -1 })
+    }).sort({ _id: -1 }).select(fieldAux)
 })
 
-// GET Account (One)
+// GET Agent (One)
 router.get('/:id', (req, res) => {
     var db = req.db
     Post.findById(req.params.id, function(error, post) {
         if (error) {
-        console.error(error)
+            console.error(error)
         }
         res.send(post)
     })

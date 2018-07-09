@@ -263,10 +263,13 @@
   import moment from 'moment'
   import AccountsService from '@/services/AccountsService'
   import OrganizationsService from '@/services/OrganizationsService'
+  import { colors as configColors } from '@/config'
 
   export default {
-    props: ['colors'],
     data: () => ({
+      // Config data
+      colors: {},
+
       //  Data
       accounts: [],
       organizations: [],
@@ -322,6 +325,7 @@
       this.initDate = this.endDate = moment().format('YYYY-MM-DD')
       this.initTime = moment().utc(true).format('HH:mm')
       this.interval = this.intervalOptions[0].value
+      this.colors = configColors
     },
     methods: {
       async getAccounts () {

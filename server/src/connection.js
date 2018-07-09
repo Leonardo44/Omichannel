@@ -1,9 +1,11 @@
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
-const host = 'localhost';
-const url = `mongodb://${host}:27017`;
-const dbName = 'eve';
+const host = process.env.DB_MONGOCLIENT_HOST || 'localhost'
+const port = process.env.DB_MONGOCLIENT_PORT || '27017'
+const dbName = process.env.DB_NAME || 'eve'
+
+const url = `mongodb://${host}:${port}`;
 
 module.exports = (callback) => {
     MongoClient.connect(url, { useNewUrlParser: true }, (err, client) => {
@@ -31,12 +33,12 @@ module.exports.test = () => {
             assert.equal(null, err);
             const db = client.db(dbName);
 
-            console.log('\n - Conectado éxitosamente! - \n');
+            console.log(`> MongoClient: \t- Conectado éxitosamente! -\n`);
             client.close();
         } catch (error) {
             console.log(error);
             console.log('----------------------------------------------');
-            console.log('\n - Ha ocurrido un error al intentar conectar a la base - \n');
+            console.log('>MongoClient: \t- Ha ocurrido un error al intentar conectar a la base - \n');
         }
     });
 }
