@@ -3,7 +3,7 @@
 
       <v-flex xs12>
         <v-form ref="form" v-model="frmIsValid" lazy-validation>
-          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Promedio de tiempo de duración por interfaz</h2>
+          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Promedio de tiempo de respuesta por interfaz</h2>
           <br>
           <v-layout row wrap justify-center class="mb-5">
             <v-flex xs12 sm12 md5 lg5>
@@ -178,11 +178,11 @@
       </v-dialog>
 
       <v-dialog v-model="resultCont" fullscreen hide-overlay transition="dialog-bottom-transition">
-        <form ref="frmReportPDF" method="POST" action="http://172.16.11.172:9000/api/account/averages_messages/pdf" target="__blank">
+        <form ref="frmReportPDF" method="POST" action="http://172.16.11.172:9000/api/account/avg_response_interface/pdf" target="__blank">
           <input type="hidden" name="data" :value="JSON.stringify(reportData)">
         </form>
 
-        <form ref="frmReportExcel" method="POST" action="http://172.16.11.172:9000/api/account/averages_messages/excel" target="__blank">
+        <form ref="frmReportExcel" method="POST" action="http://172.16.11.172:9000/api/account/avg_response_interface/excel" target="__blank">
           <input type="hidden" name="data" :value="JSON.stringify(reportData)">
         </form>
         <v-card>

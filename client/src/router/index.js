@@ -66,7 +66,7 @@ export default new Router({
     },
     {
       path: '/reports/agents/avg_response_interface',
-      name: 'avg_response_interface',
+      name: 'reports_agent_avg_tickets_time_interface',
       component: agentAvgResponseInterface
     },
     {
