@@ -103,7 +103,9 @@
           {text: 'Promedio de Tiempo de respuesta por interfaz', icon: 'settings', action: 'avg_response_interface'}
         ],
         agents: [
-          {text: 'Tickets por Interfaz', icon: 'user', action: 'reports_agent_ticketsPerInterface'}
+          {text: 'Tickets por Interfaz', icon: 'user', action: 'reports_agent_ticketsPerInterface'},
+          {text: 'Promedio de Mensajes por Ticket', icon: 'user', action: 'reports_agent_avgMsgTickets'},
+          {text: 'Promedio de Duración de Tickets por Interfaz', icon: 'user', action: 'reports_agent_avg_tickets_time_interface'}
         ]
       }
     }),

@@ -9,7 +9,9 @@ const topAgents = require('./reports/accounts/topAgents');
 const avgResponseInterface = require('./reports/accounts/avgResponseInterface');
 
 const cantTicketsPerInterfacePerAgent = require('./reports/agents/cantTicketsPerInterfacePerAgent');
-
+const avgMsgTicketsPerInterfacePerAgent = require('./reports/agents/avgMsgPerTicketsPerInterface');
+const avgTicketsDurationPerInterfacePerAgent = require('./reports/agents/avgTicketDurationPerInterface');
+const avgResponseInterfacePerAgent = require('./reports/agents/avgResponseInterface');
 /**
  * Reportes por CUENTAS
  */
@@ -38,6 +40,16 @@ router.post('/avg_response_interface', avgResponseInterface);
 /**
  * Reportes por AGENTES
  */
+
+// Cantidad de tickets por interfaz
 router.post('/agents/cant_tickets_interface',cantTicketsPerInterfacePerAgent);
 
+// Promedio de mensajes por ticket por interfaz
+router.post('/agents/avg_msg_tickets', avgMsgTicketsPerInterfacePerAgent)
+
+// Promedio de duracion de ticket por interfaz
+router.post('/agents/avg_time_ticket_interface', avgTicketsDurationPerInterfacePerAgent)
+
+// Promedio de tiempo de respuesta por interfaz
+router.post('/agents/avg_response_interface', avgResponseInterfacePerAgent)
 module.exports = router;

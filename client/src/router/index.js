@@ -19,6 +19,9 @@ import avgresponseinterface from '@/components/reports/AvgResponseInterface.vue'
  * Report Components [Agents]
  */
 import agentTicketsPerInterface from '@/components/reports/agents/cantTicketsPerInterface.vue'
+import agentAvgMsgTickets from '@/components/reports/agents/AvgMsgTickets.vue'
+import agentAvgTicketsTimeInterface from '@/components/reports/agents/AvgTicketsTimeInterface.vue'
+import agentAvgResponseInterface from '@/components/reports/agents/AvgResponseInterface.vue'
 // -----------------------------------------------------------------------------
 
 Vue.use(Router)
@@ -50,6 +53,21 @@ export default new Router({
       path: '/reports/agents/interface_tickets',
       name: 'reports_agent_ticketsPerInterface',
       component: agentTicketsPerInterface
+    },
+    {
+      path: '/reports/agents/avg_msg_tickets',
+      name: 'reports_agent_avgMsgTickets',
+      component: agentAvgMsgTickets
+    },
+    {
+      path: '/reports/agents/avg_tickets_time_interface',
+      name: 'reports_agent_avg_tickets_time_interface',
+      component: agentAvgTicketsTimeInterface
+    },
+    {
+      path: '/reports/agents/avg_response_interface',
+      name: 'avg_response_interface',
+      component: agentAvgResponseInterface
     },
     {
       path: '/reports/accounts/avg_tickets_time_interface',
