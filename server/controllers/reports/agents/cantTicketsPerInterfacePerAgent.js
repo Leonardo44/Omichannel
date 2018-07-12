@@ -2,6 +2,7 @@ const ObjectId = require('mongodb').ObjectId;
 const dbContext = require('../../../src/connection');
 
 const moment = require('moment');
+const utils = require('../utils');
 
 moment().locale('es_sv')
 
@@ -11,15 +12,23 @@ module.exports = (req, res) => {
         dbContext(async (db, client) => {
     
             let frmData = {
-                initDate: moment(`${req.body.intervalData.init.date} ${req.body.intervalData.init.time}`, 'YYYY-MM-DD H:mm'),
-                endDate: moment(`${req.body.intervalData.end.date} ${req.body.intervalData.end.time}`, 'YYYY-MM-DD H:mm'),
+                init: {
+                    date: req.body.intervalData.init.date,
+                    time: req.body.intervalData.init.time,
+                    moment: moment(`${req.body.intervalData.init.date} ${req.body.intervalData.init.time}`, 'YYYY-MM-DD HH:mm')
+                },
+                end: {
+                    date: req.body.intervalData.end.date,
+                    time: req.body.intervalData.end.time,
+                    moment: moment(`${req.body.intervalData.end.date} ${req.body.intervalData.end.time}`, 'YYYY-MM-DD HH:mm')
+                },
                 interval: {
                     type: req.body.interval.split(':')[0].toLowerCase(),
                     cant: parseInt(req.body.interval.split(':')[1])
                 }
             }
             
-            let data = {}, $flag = true, auxDate = [], msgData = [];
+            let data = {}, $flag = true, auxDate = [frmData.init.moment, null], msgData = [];
         
             if(ObjectId.isValid(req.body.agent_id)){
                 const agent = await db.collection("agents").findOne({_id: ObjectId(req.body.agent_id)});
@@ -28,27 +37,8 @@ module.exports = (req, res) => {
                     let $interfaces = [];
                     
                     while($flag){
-                        
-                        if(auxDate.length === 0){
-                            let auxLimit = frmData.initDate.clone();
-                            auxLimit.add(frmData.interval.cant, frmData.interval.type)
-                            
-                            auxDate = [frmData.initDate.clone(), auxLimit.clone()];
-                        }else{
-                            let _aux = auxDate[1].clone();
-                            
-                            auxDate[0] = auxDate[1].clone();
-                            auxDate[0].add(1, 'm');
-                            
-                            _aux.add(frmData.interval.cant, frmData.interval.type);
-                            
-                            if(_aux >= frmData.endDate){
-                                auxDate[1] = frmData.endDate.clone();
-                                $flag = false;
-                            }else{
-                                auxDate[1] = _aux.clone();
-                            }
-                        }
+                        auxDate = utils.getInterval(auxDate, frmData.init, frmData.end, frmData.interval)
+                        $flag = (auxDate[1].format('YYY-MM-DD HH:mm') !== frmData.end.moment.format('YYY-MM-DD HH:mm'))
 
                         const $tickets = await db.collection('tickets').find({
                             agent: ObjectId(agent._id),
@@ -65,15 +55,15 @@ module.exports = (req, res) => {
 
                         for($t in $tickets){
                             // if(cant) {
-                                const $messages = await db.collection('messages').find({
-                                    ticket: ObjectId($tickets[$t]._id)
-                                }).toArray();
+                            const $messages = await db.collection('messages').find({
+                                ticket: ObjectId($tickets[$t]._id)
+                            }).toArray();
+
+                            const msgInterface = $messages[0].interface;
     
-                                const msgInterface = $messages[0].interface;
-        
-                                if (!msgData[dateKey].hasOwnProperty(msgInterface)) { msgData[dateKey][msgInterface] = 0; }
-                                if ($interfaces.indexOf(msgInterface) === -1) { $interfaces.push(msgInterface) }
-                                msgData[dateKey][msgInterface]++;
+                            if (!msgData[dateKey].hasOwnProperty(msgInterface)) { msgData[dateKey][msgInterface] = 0; }
+                            if ($interfaces.indexOf(msgInterface) === -1) { $interfaces.push(msgInterface) }
+                            msgData[dateKey][msgInterface]++;
                             // }
                         }
 
@@ -81,17 +71,13 @@ module.exports = (req, res) => {
                             if(!data.hasOwnProperty(dateKey)){
                                 data[dateKey] = {};
                             }
-                            
-                            if(!data[dateKey].hasOwnProperty($interfaces[$i])){
-                                data[dateKey][$interfaces[$i]] = {}
-                            }
-                            
+
                             if(msgData[dateKey].hasOwnProperty($interfaces[$i])){
                                 let cant = msgData[dateKey][$interfaces[$i]];
                                 
                                 data[dateKey][$interfaces[$i]] = (cant);
                             }else{
-                                data[dateKey][$interfaces[$i]] = (0);
+                                data[dateKey][$interfaces[$i]] = 0;
                             }
                         }
                     }
