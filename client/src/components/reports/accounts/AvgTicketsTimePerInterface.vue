@@ -3,15 +3,25 @@
 
       <v-flex xs12>
         <v-form ref="form" v-model="frmIsValid" lazy-validation>
-          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Promedio de Tiempo de Respuesta por Interfaz por Agente</h2>
+          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Promedio de Duración de Ticket por Interfaz</h2>
           <br>
           <v-layout row wrap justify-center class="mb-5">
-            <v-flex xs12 sm12 md6 lg6>
+            <v-flex xs12 sm12 md5 lg5>
               <v-select
-                v-model="agent"
-                :items="agents" item-text="name" item-value="_id"
-                :rules="[v => !!v || 'El agente es requerido']"
-                label="Agente"
+                v-model="account"
+                :items="accounts" item-text="name" item-value="_id"
+                :rules="[v => !!v || 'La cuenta es requerida']"
+                label="Cuenta"
+                required :color="colors.secondary.back"
+              ></v-select>
+            </v-flex>
+            <v-spacer></v-spacer>
+            <v-flex xs12 sm12 md5 lg5>
+              <v-select
+                v-model="organization"
+                :items="organizations" item-text="friendly_name" item-value="_id"
+                :rules="[v => !!v || 'La organización es requerida']"
+                label="Organización"
                 required :color="colors.secondary.back"
               ></v-select>
             </v-flex>
@@ -20,7 +30,7 @@
           <v-layout row wrap>
             <v-flex xs12 sm12 md5 lg5>
               <v-layout row wrap>
-                                <span class="mb-3">Ingrese el intervalo de fechas en los que desea evaluar los datos</span>
+                <span class="mb-3">Ingrese el intervalo de fechas en los que desea evaluar los datos</span>
                 <v-flex xs12 sm12 md12 lg12>
                   <v-layout row wrap>
                     <v-flex xs12 sm12 md5 lg5>
@@ -259,16 +269,22 @@
 <script>
   import Api from '@/services/Api'
   import moment from 'moment'
-  import AgentsService from '@/services/AgentsService'
+  import AccountsService from '@/services/AccountsService'
+  import OrganizationsService from '@/services/OrganizationsService'
   import { colors as configColors, intervalOptions as configIntervals } from '@/config'
 
   export default {
     data: () => ({
       // Datos de configuración
       colors: {},
-      intervalOptions: null,
       //  Datos generales
-      agents: [],
+      accounts: [],
+      organizations: [],
+      intervalOptions: [
+        {text: '1 Día', value: 'D:1'},
+        {text: '1 Hora', value: 'H:1'},
+        {text: '30 Minutos', value: 'M:30'}
+      ],
       frmIsValid: true,
       mainData: [],
       reportData: null,
@@ -276,9 +292,10 @@
       isLoading: false,
 
       // Campos de formulario
-      agent: null,
+      account: null,
       initDate: null,
       endDate: null,
+      organization: null,
       initTime: null,
       endTime: '23:59',
       interval: null,
@@ -306,7 +323,8 @@
       dateToastMsg: false
     }),
     mounted () {
-      this.getAgents()
+      this.getAccounts()
+      this.getOrganizations()
     },
     created () {
       moment().locale('es_sv')
@@ -326,55 +344,51 @@
         return (moment(this.initTime, 'HH:mm').isBefore(moment(this.endTime, 'HH:mm'))) || 'Debes seleccionar una hora mayor a la inicial!'
       },
       // -------------------------------------------------------------
-      async getAgents () {
-        const response = await AgentsService.fetchAgents(['_id', 'name'])
-        this.agents = response.data.agents
+      async getAccounts () {
+        const response = await AccountsService.fetchAccounts()
+        this.accounts = response.data.accounts
+      },
+      async getOrganizations () {
+        const response = await OrganizationsService.fetchOrganizations()
+        console.log(response.data.organizations)
+        this.organizations = response.data.organizations
       },
       async submit () {
         if (this.$refs.form.validate()) {
           this.initLoad()
           this.isLoading = true
-          const res = await Api().post('/reports/agents/avg_response_interface', {
-            agent_id: this.agent,
+          const res = await Api().post('/reports/avg_time_ticket_interface', {
+            account_id: this.account,
+            organization_id: this.organization,
             interval: this.interval,
             intervalData: {
               init: {date: this.initDate, time: this.initTime},
               end: {date: this.endDate, time: this.endTime}
             }
           })
-
+          this.mainData = res.data
           let auxData = res.data
           let _aux = []
 
-          if (res.data.msg !== undefined) {
-            alert('Hubo un error!!!!')
-          } else {
-            for (let $dateData in auxData.data) {
-              let row = {date: $dateData.split('_').join(' ')}
-              for (let $dKey in auxData.data[$dateData]) {
-                auxData.interfaces.forEach($i => {
-                  if ($i === $dKey) {
-                    row[$dKey] = auxData.data[$dateData][$dKey]
-                  } else {
-                    row[$i] = 0
-                  }
-                })
-              }
-              _aux.push(row)
+          for (let $dateData in auxData.data) {
+            let row = {date: $dateData.split('_').join(' ')}
+            for (let $dKey in auxData.data[$dateData]) {
+              row[$dKey] = auxData.data[$dateData][$dKey]
             }
-            this.dataHeader = [{text: 'Fecha', value: 'date', align: 'center', sortable: false, 'class': this.colors.primary.back + ' white--text'}]
-            this.dataHeader = this.dataHeader.concat(auxData.interfaces.map($i => ({
-              text: $i, value: $i, sortable: false, align: 'center', 'class': this.colors.primary.back + ' white--text'
-            })))
-
-            this.mainData = _aux
-            this.reportData = res.data
-            this.reportData.data = this.mainData
-            this.resultCont = true
+            _aux.push(row)
           }
 
+          this.dataHeader = [{text: 'Fecha', value: 'date', align: 'center', sortable: false, 'class': this.colors.primary.back + ' white--text'}]
+          this.dataHeader = this.dataHeader.concat(auxData.interfaces.map($i => ({
+            text: $i.name, value: $i.name, sortable: false, align: 'center', 'class': this.colors.primary.back + ' white--text'
+          })))
+
+          this.mainData = _aux
+          this.reportData = res.data
+          this.reportData.data = this.mainData
           this.endLoad()
           this.isLoading = false
+          this.resultCont = true
         }
       },
       initLoad () {

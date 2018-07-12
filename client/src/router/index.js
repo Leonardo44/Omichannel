@@ -1,24 +1,23 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import Hello from '@/components/Hello'
-import addpost from '@/components/AddPost'
-import editpost from '@/components/EditPost'
+import Home from '@/components/Home'
 
 /**
- * Report Components [Accounts]
+ * Componente de Reportes [Cuentas]
  */
-import avgmsgtickets from '@/components/reports/AvgMsgTickets.vue'
-import ticketsinterface from '@/components/reports/TicketsInterface.vue'
-import clienttickets from '@/components/reports/ClientTickets.vue'
-import topclients from '@/components/reports/TopClients.vue'
-import avgticketstimeinterface from '@/components/reports/AvgTicketsTimeInterface.vue'
-import topagents from '@/components/reports/TopAgents.vue'
-import avgresponseinterface from '@/components/reports/AvgResponseInterface.vue'
+import accountAvgMsgPerTicketsPerInterface from '@/components/reports/accounts/AvgMsgPerTicketsPerInterface.vue'
+import accountAvgResponseTimePerInterface from '@/components/reports/accounts/AvgResponseTimePerInterface.vue'
+import accountAvgTicketsTimePerInterface from '@/components/reports/accounts/AvgTicketsTimePerInterface.vue'
+import accountCantTicketsPerClient from '@/components/reports/accounts/CantTicketsPerClient.vue'
+import accountCantTicketsPerInterface from '@/components/reports/accounts/CantTicketsPerInterface.vue'
+import accountTopAgents from '@/components/reports/accounts/TopAgents.vue'
+import accountTopClients from '@/components/reports/accounts/TopClients.vue'
+
 /**
- * Report Components [Agents]
+ * Componentes de Reportes [Agentes]
  */
-import agentTicketsPerInterface from '@/components/reports/agents/cantTicketsPerInterface.vue'
+import agentCantTicketsPerInterface from '@/components/reports/agents/cantTicketsPerInterface.vue'
 import agentAvgMsgTickets from '@/components/reports/agents/AvgMsgTickets.vue'
 import agentAvgTicketsTimeInterface from '@/components/reports/agents/AvgTicketsTimeInterface.vue'
 import agentAvgResponseInterface from '@/components/reports/agents/AvgResponseInterface.vue'
@@ -32,72 +31,62 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: Hello
+      component: Home
     },
     {
       path: '/reports/accounts/tickets_interface',
-      name: 'reports_tickets_interface',
-      component: ticketsinterface
+      name: 'accounts_tickets_interface',
+      component: accountCantTicketsPerInterface
     },
     {
       path: '/reports/accounts/avg_msg_tickets',
-      name: 'reports_avg_msg_tickets',
-      component: avgmsgtickets
+      name: 'accounts_avg_msg_tickets',
+      component: accountAvgMsgPerTicketsPerInterface
     },
     {
       path: '/reports/accounts/client_tickets',
-      name: 'reports_client_tickets',
-      component: clienttickets
+      name: 'accounts_client_tickets',
+      component: accountCantTicketsPerClient
+    },
+    {
+      path: '/reports/accounts/avg_tickets_time_interface',
+      name: 'acccounts_avg_tickets_time_interface',
+      component: accountAvgTicketsTimePerInterface
+    },
+    {
+      path: '/reports/accounts/top_clients',
+      name: 'accounts_top_clients',
+      component: accountTopClients
+    },
+    {
+      path: '/reports/accounts/top_agents',
+      name: 'accounts_top_agents',
+      component: accountTopAgents
+    },
+    {
+      path: '/reports/accounts/avg_response_interface',
+      name: 'accounts_avg_response_interface',
+      component: accountAvgResponseTimePerInterface
     },
     {
       path: '/reports/agents/interface_tickets',
-      name: 'reports_agent_ticketsPerInterface',
-      component: agentTicketsPerInterface
+      name: 'agents_cantTicketsPerInterface',
+      component: agentCantTicketsPerInterface
     },
     {
       path: '/reports/agents/avg_msg_tickets',
-      name: 'reports_agent_avgMsgTickets',
+      name: 'agents_avgMsgTickets',
       component: agentAvgMsgTickets
     },
     {
       path: '/reports/agents/avg_tickets_time_interface',
-      name: 'reports_agent_avg_tickets_time_interface',
+      name: 'agents_avgTicketsTimePerInterface',
       component: agentAvgTicketsTimeInterface
     },
     {
       path: '/reports/agents/avg_response_interface',
-      name: 'avg_response_interface',
+      name: 'agents_avgResponseTimePerInterface',
       component: agentAvgResponseInterface
-    },
-    {
-      path: '/reports/accounts/avg_tickets_time_interface',
-      name: 'avg_tickets_time_interface',
-      component: avgticketstimeinterface
-    },
-    {
-      path: '/reports/accounts/top_clients',
-      name: 'top_clients',
-      component: topclients
-    },
-    {
-      path: '/reports/accounts/top_agents',
-      name: 'top_agents',
-      component: topagents
-    },
-    {
-      path: '/reports/accounts/avg_response_interface',
-      name: 'avg_response_interface',
-      component: avgresponseinterface
-    },
-    {
-      path: '/posts/add',
-      name: 'addpost',
-      component: addpost
-    },
-    {
-      path: '/posts/:id/edit',
-      name: 'editpost',
-      component: editpost
     }
   ]
 })

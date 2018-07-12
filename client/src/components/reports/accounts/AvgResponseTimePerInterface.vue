@@ -3,7 +3,7 @@
 
       <v-flex xs12>
         <v-form ref="form" v-model="frmIsValid" lazy-validation>
-          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Promedio de Mensajes por Ticket por Interfaz de Cuenta</h2>
+          <h2 :class="colors.primary.text + ' text-xs-center text-sm-center text-md-center text-lg-center'">Promedio de tiempo de duración por interfaz</h2>
           <br>
           <v-layout row wrap justify-center class="mb-5">
             <v-flex xs12 sm12 md6 lg6>
@@ -20,118 +20,128 @@
           <v-layout row wrap>
             <v-flex xs12 sm12 md5 lg5>
               <v-layout row wrap>
-                <span class="mb-3">Ingrese los límites de tiempo en los cuales se filtrarán los datos</span>
-                <v-flex xs12 sm12 md6 lg6>
-                  <v-menu
-                    ref="initDateMenu"
-                    v-model="initDateMenu"
-                    lazy
-                    transition="scale-transition"
-                    offset-y
-                    full-width
-                    min-width="290px"
-                    :nudge-right="40"
-                    :return-value.sync="initDate"
-                    :close-on-content-click="false"
-                  >
-                    <v-text-field
-                      ref="initDateControl"
-                      slot="activator"
-                      v-model="initDate"
-                      label="Fecha de Inicio"
-                      prepend-icon="event"
-                      readonly
-                      :color="colors.secondary.back"
-                      required
-                      :rules="[rules.date.required, rules.date.format]"
-                    ></v-text-field>
-                    <v-date-picker v-model="initDate" first-day-of-week="1" locale="es_es" scrollable :color="colors.secondary.back" @input="$refs.initDateMenu.save(initDate)"></v-date-picker>
-
-                  </v-menu>
-
-                  <v-menu
-                    ref="endDateMenu"
-                    v-model="endDateMenu"
-                    lazy
-                    transition="scale-transition"
-                    offset-y
-                    full-width
-                    min-width="290px"
-                    :nudge-right="40"
-                    :return-value.sync="endDate"
-                    :close-on-content-click="false"
-                  >
-                    <v-text-field
-                      ref="endDateControl"
-                      slot="activator"
-                      v-model="endDate"
-                      label="Fecha de Fin"
-                      prepend-icon="event"
-                      readonly
-                      required
-                      :color="colors.secondary.back"
-                      :rules="[rules.date.required, rules.date.format]"
-                    ></v-text-field>
-                    <v-date-picker v-model="endDate" first-day-of-week="1" locale="es_es" scrollable :color="colors.secondary.back" @input="$refs.endDateMenu.save(endDate)"></v-date-picker>
-                  </v-menu>
+                <span class="mb-3">Ingrese el intervalo de fechas en los que desea evaluar los datos</span>
+                <v-flex xs12 sm12 md12 lg12>
+                  <v-layout row wrap>
+                    <v-flex xs12 sm12 md5 lg5>
+                      <v-menu
+                        ref="initDateMenu"
+                        v-model="initDateMenu"
+                        lazy
+                        transition="scale-transition"
+                        offset-y
+                        full-width
+                        min-width="290px"
+                        :nudge-right="40"
+                        :return-value.sync="initDate"
+                        :close-on-content-click="false"
+                      >
+                        <v-text-field
+                          ref="initDateControl"
+                          slot="activator"
+                          v-model="initDate"
+                          label="Fecha de Inicio"
+                          prepend-icon="event"
+                          readonly
+                          :color="colors.secondary.back"
+                          required
+                          :rules="[rules.date.required, rules.date.format]"
+                        ></v-text-field>
+                        <v-date-picker v-model="initDate" first-day-of-week="1" locale="es_es" scrollable :color="colors.secondary.back" @input="$refs.initDateMenu.save(initDate)"></v-date-picker>
+                      </v-menu>
+                    </v-flex>
+                    <v-flex d-flex justify-center align-center class="text-xs-center"><span class="hidden-sm-and-down"> - </span></v-flex>
+                    <v-flex xs12 sm12 md5 lg5>
+                      <v-menu
+                        ref="endDateMenu"
+                        v-model="endDateMenu"
+                        lazy
+                        transition="scale-transition"
+                        offset-y
+                        full-width
+                        min-width="290px"
+                        :nudge-right="40"
+                        :return-value.sync="endDate"
+                        :close-on-content-click="false"
+                      >
+                        <v-text-field
+                          ref="endDateControl"
+                          slot="activator"
+                          v-model="endDate"
+                          label="Fecha de Fin"
+                          readonly
+                          required
+                          :color="colors.secondary.back"
+                          :rules="[rules.date.required, rules.date.format, this.validDateInterval]"
+                        ></v-text-field>
+                        <v-date-picker v-model="endDate" first-day-of-week="1" locale="es_es" scrollable :color="colors.secondary.back" @input="$refs.endDateMenu.save(endDate)"></v-date-picker>
+                      </v-menu>
+                    </v-flex>
+                  </v-layout>
                 </v-flex>
+                
+                <span class="mb-3">Ingrese el intervalo de horas que desea evaluar los datos</span>
 
-                <v-flex xs12 sm12 md6 lg6>
-                  <v-menu
-                    ref="initTimeMenu"
-                    :close-on-content-click="false"
-                    v-model="initTimeMenu"
-                    :nudge-right="40"
-                    :return-value.sync="initTime"
-                    lazy
-                    transition="scale-transition"
-                    offset-y
-                    full-width
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <v-text-field
-                      ref="initTimeControl"
-                      slot="activator"
-                      v-model="initTime"
-                      label="Hora de Inicio"
-                      prepend-icon="access_time"
-                      readonly
-                      required
-                      :color="colors.secondary.back"
-                      :rules="[rules.time.required, rules.time.format]"
-                    ></v-text-field>
-                    <v-time-picker v-model="initTime" first-day-of-week="1" locale="es_es" scrollable :color="colors.secondary.back" @change="$refs.initTimeMenu.save(initTime)"></v-time-picker>
+                <v-flex xs12 sm12 md12 lg12>
+                  <v-layout row wrap>
+                    <v-flex xs12 sm12 md5 lg5>
+                      <v-menu
+                        ref="initTimeMenu"
+                        :close-on-content-click="false"
+                        v-model="initTimeMenu"
+                        :nudge-right="40"
+                        :return-value.sync="initTime"
+                        lazy
+                        transition="scale-transition"
+                        offset-y
+                        full-width
+                        max-width="290px"
+                        min-width="290px"
+                      >
+                        <v-text-field
+                          ref="initTimeControl"
+                          slot="activator"
+                          v-model="initTime"
+                          label="Hora de Inicio"
+                          prepend-icon="access_time"
+                          readonly
+                          required
+                          :color="colors.secondary.back"
+                          :rules="[rules.time.required, rules.time.format]"
+                        ></v-text-field>
+                        <v-time-picker v-model="initTime" first-day-of-week="1" locale="es_es" scrollable :color="colors.secondary.back" @change="$refs.initTimeMenu.save(initTime)"></v-time-picker>
+                      </v-menu>
+                    </v-flex>
+                    <v-flex d-flex justify-center align-center class="text-xs-center"><span class="hidden-sm-and-down"> - </span></v-flex>
+                    <v-flex xs12 sm12 md5 lg5>
+                      <v-menu
+                        ref="endTimeMenu"
+                        :close-on-content-click="false"
+                        v-model="endTimeMenu"
+                        :nudge-right="40"
+                        :return-value.sync="endTime"
+                        lazy
+                        transition="scale-transition"
+                        offset-y
+                        full-width
+                        max-width="290px"
+                        min-width="290px"
+                      >
+                        <v-text-field
+                          ref="endTimeControl"
+                          slot="activator"
+                          v-model="endTime"
+                          label="Hora de Fin"
+                          readonly
+                          required
+                          :color="colors.secondary.back"
+                          :rules="[rules.time.required, rules.time.format, this.validTimeInterval]"
+                        ></v-text-field>
+                        <v-time-picker v-model="endTime" first-day-of-week="1" locale="es_es" scrollable :color="colors.secondary.back" @change="$refs.endTimeMenu.save(endTime)"></v-time-picker>
 
-                  </v-menu>
-
-                  <v-menu
-                    ref="endTimeMenu"
-                    :close-on-content-click="false"
-                    v-model="endTimeMenu"
-                    :nudge-right="40"
-                    :return-value.sync="endTime"
-                    lazy
-                    transition="scale-transition"
-                    offset-y
-                    full-width
-                    max-width="290px"
-                    min-width="290px"
-                  >
-                    <v-text-field
-                      ref="endTimeControl"
-                      slot="activator"
-                      v-model="endTime"
-                      label="Hora de Fin"
-                      prepend-icon="access_time"
-                      readonly
-                      required
-                      :color="colors.secondary.back"
-                      :rules="[rules.time.required, rules.time.format]"
-                    ></v-text-field>
-                    <v-time-picker v-model="endTime" first-day-of-week="1" locale="es_es" scrollable :color="colors.secondary.back" @change="$refs.endTimeMenu.save(endTime)"></v-time-picker>
-
-                  </v-menu>
+                      </v-menu>
+                    </v-flex>
+                  </v-layout>
                 </v-flex>
               </v-layout>
             </v-flex>
@@ -140,7 +150,7 @@
 
             <v-flex xs12 sm12 md5 lg5>
               <v-layout column justify-center>
-              <span class="">Seleccione el tipo de intervalo en el cual se dividirán los datos</span>
+              <span>Seleccione el tipo de intervalo en el cual se dividirán los datos</span>
                 <div>
                   <v-radio-group v-model="interval" required :rules="[v => !!v || 'Debe seleccionar un intervalo']">
                     <v-radio v-for="(_opt) in intervalOptions" :key="_opt.value" :label="_opt.text" :value="_opt.value" :color="colors.secondary.back"></v-radio>
@@ -226,9 +236,7 @@
               </td>
             </template>
           </v-data-table>
-
           <br><br>
-
         </v-card>
       </v-dialog>
 
@@ -256,9 +264,9 @@
 
   export default {
     data: () => ({
-      // Config data
+      // Datos de configuración
       colors: {},
-      //  Data
+      //  Datos generales
       accounts: [],
       intervalOptions: [
         {text: '1 Día', value: 'D:1'},
@@ -271,7 +279,7 @@
       dataHeader: [],
       isLoading: false,
 
-      // Form Fields
+      // Campos de formulario
       account: null,
       initDate: null,
       endDate: null,
@@ -279,7 +287,7 @@
       endTime: '23:59',
       interval: null,
 
-      //  Validation Rules
+      //  Reglas de validación
       rules: {
         date: {
           required: v => !!v || 'Debes ingresar una fecha',
@@ -291,7 +299,7 @@
         }
       },
 
-      //  UI Components Initialization
+      //  Inicialización de Componentes UI
       initDateMenu: false,
       endDateMenu: false,
       initTimeMenu: false,
@@ -301,18 +309,26 @@
       dateErrorToast: null,
       dateToastMsg: false
     }),
-
     mounted () {
       this.getAccounts()
     },
     created () {
       moment().locale('es_sv')
-      this.initDate = this.endDate = moment().format('YYYY-MM-DD')
+      this.initDate = moment().format('YYYY-MM-DD')
+      this.endDate = moment().add(1, 'd').format('YYYY-MM-DD')
       this.initTime = moment().utc(true).format('HH:mm')
       this.interval = this.intervalOptions[0].value
       this.colors = configColors
     },
     methods: {
+      // Métodos de validación de fechas
+      validDateInterval (v) {
+        return (moment(this.initDate, 'YYYY-MM-DD').isBefore(moment(this.endDate, 'YYYY-MM-DD'))) || 'Debes seleccionar una fecha mayor a la inicial!'
+      },
+      validTimeInterval (v) {
+        return (moment(this.initTime, 'HH:mm').isBefore(moment(this.endTime, 'HH:mm'))) || 'Debes seleccionar una hora mayor a la inicial!'
+      },
+      // -------------------------------------------------------------
       async getAccounts () {
         const response = await AccountsService.fetchAccounts()
         this.accounts = response.data.accounts
@@ -335,7 +351,7 @@
           if (this.$refs.form.validate()) {
             this.initLoad()
             this.isLoading = true
-            const res = await Api().post('/reports/avg_msg_tickets', {
+            const res = await Api().post('/reports/avg_response_interface', {
               account_id: this.account,
               interval: this.interval,
               intervalData: {
@@ -343,7 +359,7 @@
                 end: {date: this.endDate, time: this.endTime}
               }
             })
-  
+
             let auxData = res.data
             let _aux = []
   
