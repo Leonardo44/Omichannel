@@ -37,59 +37,54 @@ module.exports = (req, res) => {
                 const dateKey = `${moment(auxDate[0]).format('YYYY-MM-DD_HH:mm')}_-_${moment(auxDate[1]).format('YYYY-MM-DD_HH:mm')}`;
                 data[dateKey] = [];
 
-                if((auxDate[1].format('H:mm:s') <= frmData.endDate.format('H:mm:s'))
-                    && (auxDate[1].format('H:mm:s') >= frmData.initDate.format('H:mm:s'))
-                    && (auxDate[0].format('H:mm:s') <= frmData.endDate.format('H:mm:s'))
-                    && (auxDate[0].format('H:mm:s') >= frmData.initDate.format('H:mm:s'))){
-                    
-                    const $tickets = await  db.collection("tickets").aggregate([ //Obtenemos los 10 clientes por fecha
-                        {
-                            $lookup: {
-                                from: 'clients',
-                                localField: 'client',
-                                foreignField: '_id',
-                                as: 'client_data'
-                            }
-                        },
-                        {
-                            $match: {
-                                "account": ObjectId(account._id),
-                                "organization": ObjectId(organization._id),
-                                "last_msg_date": { //Fecha
-                                    $gte: new Date(auxDate[0]),
-                                    $lt: new Date(auxDate[1])
-                                }
-                            }
-                        },
-                        {
-                            $group: {
-                                _id: "$client",
-                                count: { $sum: 1 },
-                                name_client: { $push: "$client_data.interfaces" }
-                            }
-                        },
-                        {
-                            $sort: {
-                                count: -1
-                            }
-                        },
-                        {
-                            $limit: 10
+                const $tickets = await  db.collection("tickets").aggregate([ //Obtenemos los 10 clientes por fecha
+                    {
+                        $lookup: {
+                            from: 'clients',
+                            localField: 'client',
+                            foreignField: '_id',
+                            as: 'client_data'
                         }
-                    ]).toArray();
+                    },
+                    {
+                        $match: {
+                            "account": ObjectId(account._id),
+                            "organization": ObjectId(organization._id),
+                            "last_msg_date": { //Fecha
+                                $gte: new Date(auxDate[0]),
+                                $lt: new Date(auxDate[1])
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$client",
+                            count: { $sum: 1 },
+                            name_client: { $first: "$client_data.interfaces" }
+                        }
+                    },
+                    {
+                        $sort: {
+                            count: -1
+                        }
+                    },
+                    {
+                        $limit: 10
+                    }
+                ]).toArray();
 
-                    for(let $t in $tickets){
-                        let name_client = `${$tickets[$t].name_client[0][0][0].name}[${$tickets[$t].name_client[0][0][0].service}]`; 
-                        data[dateKey].push({
-                            id: $tickets[$t]._id,
-                            name: name_client,
-                            cant: $tickets[$t].count
-                        });
-                    }//fin for(let $t in $tickets)
-                }//fin if
+                for(let $t in $tickets){
+                    let name_client = `${$tickets[$t].name_client[0][0].name}[${$tickets[$t].name_client[0][0].service}]`; 
+                    data[dateKey].push({
+                        id: $tickets[$t]._id,
+                        name: name_client,
+                        cant: $tickets[$t].count
+                    });
+                }//fin for(let $t in $tickets)
             }//fin while($flag)
 
             res.send({
+                account: account.name,
                 data: data
             });
             

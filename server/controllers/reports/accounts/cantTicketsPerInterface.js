@@ -37,55 +37,40 @@ module.exports = (req, res) => {
     
                 const dateKey = `${moment(auxDate[0]).format('YYYY-MM-DD_HH:mm')}_-_${moment(auxDate[1]).format('YYYY-MM-DD_HH:mm')}`;
                 msgData[dateKey] = [];
-                console.log(18 >= 6);
-                console.log("_____________________________________________________________________________________________");
-                console.log(`Fecha Final: ${auxDate[1].format('H:mm:s')}. Fecha Final: ${frmData.endDate.format('H:mm:s')}.`);
-                console.log( auxDate[1].format('H:mm:s') <= frmData.endDate.format('H:mm:s') );
-                console.log(`Fecha Final: ${auxDate[1].format('H:mm:s')}. Fecha Final: ${frmData.initDate.format('H:mm:s')}.`);
-                console.log( auxDate[1].format('H:mm:s') >= frmData.initDate.format('H:mm:s') );
-                console.log(`Fecha Inicial: ${auxDate[0].format('H:mm:s')}. Fecha Final: ${frmData.endDate.format('H:mm:s')}.`);
-                console.log( auxDate[0].format('H:mm:s') <= frmData.endDate.format('H:mm:s') );
-                console.log(`Fecha Inicial: ${auxDate[0].format('H:mm:s')}. Fecha Final: ${frmData.initDate.format('H:mm:s')}.`);
-                console.log( auxDate[0].format('H:mm:s') >= frmData.initDate.format('H:mm:s') );
 
-                if( (auxDate[1].format('H:mm:s') <= frmData.endDate.format('H:mm:s'))
-                    && (auxDate[1].format('H:mm:s') >= frmData.initDate.format('H:mm:s'))
-                    && (auxDate[0].format('H:mm:s') <= frmData.endDate.format('H:mm:s'))
-                    && (auxDate[0].format('H:mm:s') >= frmData.initDate.format('H:mm:s'))){
-                        const $tickets = await db.collection("tickets").aggregate([ //Obtenemos los tickets por cuenta iterada 
-                        {
-                            $lookup: {
-                                from: 'messages',
-                                localField: 'last_msg',
-                                foreignField: '_id',
-                                as: 'last_message'
-                            }
-                        },
-                        {
-                            $match: {
-                                "account": ObjectId(account._id),
-                                "last_msg_date": { //Fecha
-                                    $gte: new Date(auxDate[0]),
-                                    $lt: new Date(auxDate[1])
-                                }
+                const $tickets = await db.collection("tickets").aggregate([ //Obtenemos los tickets por cuenta iterada 
+                    {
+                        $lookup: {
+                            from: 'messages',
+                            localField: 'last_msg',
+                            foreignField: '_id',
+                            as: 'last_message'
+                        }
+                    },
+                    {
+                        $match: {
+                            "account": ObjectId(account._id),
+                            "last_msg_date": { //Fecha
+                                $gte: new Date(auxDate[0]),
+                                $lt: new Date(auxDate[1])
                             }
                         }
-                    ]).toArray();
-    
-                    for(let $t in $tickets){
-                        if(!msgData[dateKey].hasOwnProperty($tickets[$t].last_message[0].interface)){ msgData[dateKey][$tickets[$t].last_message[0].interface] = 0; }
-                        msgData[dateKey][$tickets[$t].last_message[0].interface] += 1;
                     }
-    
-                    for(var $i in $interfaces){
-                        if(!data.hasOwnProperty(dateKey)){ data[dateKey] = {}; }
-                        if(!data[dateKey].hasOwnProperty($interfaces[$i].service)){ data[dateKey][$interfaces[$i].service] = {} }
-    
-                        if(msgData[dateKey].hasOwnProperty($interfaces[$i].service)){
-                            data[dateKey][$interfaces[$i].service] = msgData[dateKey][$interfaces[$i].service];
-                        }else{
-                            data[dateKey][$interfaces[$i].service] = 0;
-                        }
+                ]).toArray();
+
+                for(let $t in $tickets){
+                    if(!msgData[dateKey].hasOwnProperty($tickets[$t].last_message[0].interface)){ msgData[dateKey][$tickets[$t].last_message[0].interface] = 0; }
+                    msgData[dateKey][$tickets[$t].last_message[0].interface] += 1;
+                }
+
+                for(var $i in $interfaces){
+                    if(!data.hasOwnProperty(dateKey)){ data[dateKey] = {}; }
+                    if(!data[dateKey].hasOwnProperty($interfaces[$i].service)){ data[dateKey][$interfaces[$i].service] = {} }
+
+                    if(msgData[dateKey].hasOwnProperty($interfaces[$i].service)){
+                        data[dateKey][$interfaces[$i].service] = msgData[dateKey][$interfaces[$i].service];
+                    }else{
+                        data[dateKey][$interfaces[$i].service] = 0;
                     }
                 }
             }
