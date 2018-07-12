@@ -30,13 +30,14 @@ module.exports = (req, res) => {
             
             let data = {}, $flag = true, auxDate = [frmData.init.moment, null], msgData = [];
         
-            if(ObjectId.isValid(req.body.account_id)){
-                const account = await db.collection("accounts").findOne({_id: ObjectId(req.body.account_id)});
-        
-                if(account !== null){
-                    const $interfaces = account.interfaces;
-                    const $tickets = await db.collection("tickets").find({ account: ObjectId(account._id) }).toArray();
-                    
+            if(ObjectId.isValid(req.body.agent_id)){
+                const agent = await db.collection("agents").findOne({_id: ObjectId(req.body.agent_id)});
+                
+                if(agent !== null){
+                    let $interfaces = [];
+                    const $tickets = await db.collection('tickets').find({
+                        agent: ObjectId(agent._id)
+                    }).toArray();
                     while($flag){
                         auxDate = utils.getInterval(auxDate, frmData.init, frmData.end, frmData.interval)
                         $flag = (auxDate[1].format('YYY-MM-DD HH:mm') !== frmData.end.moment.format('YYY-MM-DD HH:mm'))
@@ -54,38 +55,36 @@ module.exports = (req, res) => {
                             }).toArray();
                                 
                             const cant = msgs.length;
-        
+
                             if(cant) {
                                 const msgInterface = msgs[0].interface;
-        
+
                                 if (!msgData[dateKey].hasOwnProperty(msgInterface)) { msgData[dateKey][msgInterface] = []; }
+                                if ($interfaces.indexOf(msgInterface) === -1) { $interfaces.push(msgInterface) }
+                                
                                 msgData[dateKey][msgInterface].push(cant);
                             }
                         }
         
                         
                         for(let $i in $interfaces){
-                            if(!data.hasOwnProperty(dateKey)){
-                                data[dateKey] = {};
-                            }
+                            if(!data.hasOwnProperty(dateKey)){ data[dateKey] = {}; }
                             
-                            if(!data[dateKey].hasOwnProperty($interfaces[$i].service)){
-                                data[dateKey][$interfaces[$i].service] = {}
-                            }
+                            if(!data[dateKey].hasOwnProperty($interfaces[$i])){ data[dateKey][$interfaces[$i]] = {}; }
                             
-                            if(msgData[dateKey].hasOwnProperty($interfaces[$i].service)){
-                                const avg = msgData[dateKey][$interfaces[$i].service].reduce((sum, n) => sum + n, 0) / msgData[dateKey][$interfaces[$i].service].length;
+                            if(msgData[dateKey].hasOwnProperty($interfaces[$i])){
+                                const avg = msgData[dateKey][$interfaces[$i]].reduce((sum, n) => sum + n, 0) / msgData[dateKey][$interfaces[$i]].length;
                                 
-                                data[dateKey][$interfaces[$i].service] = (avg);
+                                data[dateKey][$interfaces[$i]] = (avg);
                             }else{
-                                data[dateKey][$interfaces[$i].service] = (0);
+                                data[dateKey][$interfaces[$i]] = (0);
                             }
                         }
                     }
-                    
+
                     res.send({
-                        account: account.name,
-                        interfaces: $interfaces.map(x => ({name: x.service, picture: x.picture})),
+                        agent: agent.name,
+                        interfaces: $interfaces,
                         data
                     });
                 }else{

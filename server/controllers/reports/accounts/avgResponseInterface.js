@@ -74,7 +74,6 @@ module.exports = (req, res) => {
                             return 0;
                         });
                         let index_client = -1;
-                        console.log($tickets[$t]._id);
                         for(let $m in $messages){
                             /** 
                                 "origin": "external" - Producido por cliente,
