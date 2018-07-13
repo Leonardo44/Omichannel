@@ -15,16 +15,6 @@
                 required :color="colors.secondary.back"
               ></v-select>
             </v-flex>
-            <v-spacer></v-spacer>
-            <v-flex xs12 sm12 md5 lg5>
-              <v-select
-                v-model="organization"
-                :items="organizations" item-text="friendly_name" item-value="_id"
-                :rules="[v => !!v || 'La organización es requerida']"
-                label="Organización"
-                required :color="colors.secondary.back"
-              ></v-select>
-            </v-flex>
           </v-layout>
 
           <v-layout row wrap>
@@ -270,7 +260,6 @@
   import Api from '@/services/Api'
   import moment from 'moment'
   import AccountsService from '@/services/AccountsService'
-  import OrganizationsService from '@/services/OrganizationsService'
   import { colors as configColors, intervalOptions as configIntervals } from '@/config'
 
   export default {
@@ -279,7 +268,6 @@
       colors: {},
       //  Datos generales
       accounts: [],
-      organizations: [],
       intervalOptions: [
         {text: '1 Día', value: 'D:1'},
         {text: '1 Hora', value: 'H:1'},
@@ -295,7 +283,6 @@
       account: null,
       initDate: null,
       endDate: null,
-      organization: null,
       initTime: null,
       endTime: '23:59',
       interval: null,
@@ -348,18 +335,12 @@
         const response = await AccountsService.fetchAccounts()
         this.accounts = response.data.accounts
       },
-      async getOrganizations () {
-        const response = await OrganizationsService.fetchOrganizations()
-        console.log(response.data.organizations)
-        this.organizations = response.data.organizations
-      },
       async submit () {
         if (this.$refs.form.validate()) {
           this.initLoad()
           this.isLoading = true
           const res = await Api().post('/reports/avg_time_ticket_interface', {
             account_id: this.account,
-            organization_id: this.organization,
             interval: this.interval,
             intervalData: {
               init: {date: this.initDate, time: this.initTime},

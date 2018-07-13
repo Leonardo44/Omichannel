@@ -188,11 +188,11 @@
       </v-dialog>
 
       <v-dialog v-model="resultCont" fullscreen hide-overlay transition="dialog-bottom-transition">
-        <form ref="frmReportPDF" method="POST" action="http://172.16.11.172:9000/api/account/averages_messages/pdf" target="__blank">
+        <form ref="frmReportPDF" method="POST" action="http://172.16.11.172:9000/api/agent/avg_duration_tickets_interface/pdf" target="__blank">
           <input type="hidden" name="data" :value="JSON.stringify(reportData)">
         </form>
 
-        <form ref="frmReportExcel" method="POST" action="http://172.16.11.172:9000/api/account/averages_messages/excel" target="__blank">
+        <form ref="frmReportExcel" method="POST" action="http://172.16.11.172:9000/api/agent/avg_duration_tickets_interface/excel" target="__blank">
           <input type="hidden" name="data" :value="JSON.stringify(reportData)">
         </form>
         <v-card>
